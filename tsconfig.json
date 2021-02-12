@@ -1,6 +1,15 @@
 {
   "compilerOptions": {
-    "isolatedModules": true,
+    "target": "ESNext",
+    "module": "ESNext",
+    "lib": ["ESNext", "DOM"],
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    // "isolatedModules": true,
     // "types": ["vite/client"]
-  }
+  },
+  "include": [
+    "imports.ts",
+    "src/**/*.ts"
+  ]
 }
