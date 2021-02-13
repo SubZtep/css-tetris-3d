@@ -1,10 +1,10 @@
+import { setCSSVar } from "./cssvar"
+
 const level = {
   width: 6,
   height: 5,
   depth: 3,
 }
-
-const setCSSVar = (propery: string, value: string) => document.documentElement.style.setProperty(`--${propery}`, value)
 
 const containerEl: HTMLDivElement = document.querySelector(".container")
 const levelEl: HTMLDivElement = containerEl.querySelector(".level")
