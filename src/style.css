@@ -1,3 +1,14 @@
+:root {
+  --mouse-x: 50%;
+  --mouse-y: 50%;
+
+  --square-length: 2rem;
+
+  --width: 3;
+  --height: 3;
+  --depth: 3;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -10,9 +21,6 @@ body {
 }
 
 .container {
-  --mouse-x: 50%;
-  --mouse-y: 50%;
-
   display: flex;
   align-items: center;
   justify-content: center;
@@ -25,7 +33,7 @@ body {
 }
 
 .level {
-  --square-length:  2rem;
+
 
   transform-style: preserve-3d;
   & > div {

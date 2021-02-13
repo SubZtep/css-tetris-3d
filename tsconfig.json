@@ -5,6 +5,7 @@
     "lib": ["ESNext", "DOM"],
     "esModuleInterop": true,
     "skipLibCheck": true,
+    "sourceMap": true
     // "isolatedModules": true,
     // "types": ["vite/client"]
   },
