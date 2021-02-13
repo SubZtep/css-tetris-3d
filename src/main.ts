@@ -4,13 +4,7 @@ const level = {
   depth: 3,
 }
 
-const setCSSVar = (propery: string, value: string) => {
-  // @ts-ignore
-  // const root = document.documentElement.style
-  const root = document.styleSheets[0].cssRules[0].style
-  // const root = document.querySelector(":root").style
-  root.setProperty(`--${propery}`, value)
-}
+const setCSSVar = (propery: string, value: string) => document.documentElement.style.setProperty(`--${propery}`, value)
 
 const containerEl: HTMLDivElement = document.querySelector(".container")
 const levelEl: HTMLDivElement = containerEl.querySelector(".level")
