@@ -3,8 +3,8 @@ const tempCSSVars = new Map<string, string>()
 
 const mutateCSSVars = () => {
   ticking = false
-  for (let [propery, value] of tempCSSVars.entries()) {
-    document.documentElement.style.setProperty(`--${propery}`, value)
+  for (const [property, value] of tempCSSVars.entries()) {
+    document.documentElement.style.setProperty(`--${property}`, value)
   }
   tempCSSVars.clear()
 }
@@ -16,7 +16,9 @@ const requestTick = () => {
   ticking = true
 }
 
-export const setCSSVar = (propery: string, value: string) => {
-  tempCSSVars.set(propery, value)
+export const setCSSVar = (property: string, value: string): void => {
+  tempCSSVars.set(property, value)
   requestTick()
 }
+
+export const getCSSVar = (property: string): string => document.documentElement.style.getPropertyValue(`--${property}`)

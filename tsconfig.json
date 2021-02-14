@@ -3,6 +3,7 @@
     "target": "ESNext",
     "module": "ESNext",
     "lib": ["ESNext", "DOM"],
+    "moduleResolution": "Node",
     "esModuleInterop": true,
     "skipLibCheck": true,
     "sourceMap": true
@@ -11,6 +12,7 @@
   },
   "include": [
     "imports.ts",
-    "src/**/*.ts"
+    "src/**/*.ts",
+    "playwright/**/*.ts"
   ]
 }
