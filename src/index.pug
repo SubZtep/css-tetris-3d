@@ -1,15 +1,18 @@
+mixin cube
+  .cube
+    each val in ["front", "back", "right", "left", "top", "bottom"]
+      div(class=val)
+
 .container
   .level
-    .face.back
-    .face.right
-    .face.left
-    .face.top
-    .face.bottom
+    .side.back
+    .side.right
+    .side.left
+    .side.top
+    .side.bottom
 
-  .cube
-    .face.front
-    .face.back
-    .face.right
-    .face.left
-    .face.top
-    .face.bottom
+    .block
+      +cube
+      +cube
+      +cube
+      +cube

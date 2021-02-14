@@ -1,16 +1,15 @@
-import { setCSSVar } from "./cssvar"
+import { setProp } from "./css"
 
 export const level = {
   width: 6,
   height: 5,
-  depth: 30,
+  depth: 10,
 }
 
-export const generateLevel = (containerEl: HTMLElement): void => {
-  const levelEl: HTMLDivElement = containerEl.querySelector(".level")
-  Object.keys(level).forEach(key => setCSSVar(key, level[key]))
+export const generateLevel = (container: HTMLElement): void => {
+  Object.keys(level).forEach(key => setProp(key, level[key]))
 
-  levelEl.querySelectorAll(".face").forEach(el => {
+  container.querySelectorAll(".level > .side").forEach(el => {
     const rectCount = el.classList.contains("back")
       ? level.width * level.height
       : el.classList.contains("top") || el.classList.contains("bottom")
@@ -24,13 +23,13 @@ export const generateLevel = (containerEl: HTMLElement): void => {
   })
 }
 
-export const observeResize = (containerEl: HTMLElement): void => {
+export const observeResize = (container: HTMLElement): void => {
   new ResizeObserver(([{ contentRect }]) => {
     const { width, height } = contentRect
     // const minWidth = Math.floor(Math.min(width / level.width, height / level.height))
-    // setCSSVar("edge", Math.floor((minWidth / level.depth) * 1.5) + "px")
-    // setCSSVar("edge", Math.floor(minWidth / level.depth) + "rem")
+    // setProp("edge", Math.floor((minWidth / level.depth) * 1.5) + "px")
+    // setProp("edge", Math.floor(minWidth / level.depth) + "rem")
     const minWidth = Math.min(width / level.width, height / level.height)
-    setCSSVar("edge", minWidth / level.depth + "rem")
-  }).observe(containerEl)
+    setProp("edge", minWidth / level.depth + "rem")
+  }).observe(container)
 }
