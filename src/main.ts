@@ -7,24 +7,23 @@ window.addEventListener("load", () => {
   const container = document.querySelector<HTMLElement>(".container")
 
   css.initProps(container)({
-    perspective: "50rem",
+    perspective: "800px",
     mouseX: "50%",
     mouseY: "50%",
 
-    edge: "3rem",
-    halfEdge: "calc(var(--edge) / 2)",
+    edge: "100px",
 
-    width: "6",
-    height: "5",
-    depth: "10",
+    cols: level.level.cols.toString(),
+    rows: level.level.rows.toString(),
+    floor: level.level.floor.toString(),
 
-    translateX: "0rem",
-    translateY: "0rem",
-    translateZ: "calc(var(--edge) * var(--depth))",
-    // translateZ: "calc(var(--edge) * var(--depth) - var(--halfEdge))",
+    translateX: "0px",
+    translateY: "0px",
+    translateZ: (100 * level.level.floor) + "px", // "calc(var(--edge) * var(--floor))",
+
     rotateX: "0deg",
     rotateZ: "0deg",
-    radius: "0rem",
+    radius: "0px",
   })
 
   level.generateLevel(container)
@@ -41,10 +40,9 @@ window.addEventListener("load", () => {
   })
 
   input.pipeline.wheel.push(({ deltaY }) => {
-    let pers = parseFloat(css.getProp("perspective"))
-    pers += deltaY / (pers < 10 ? 1000 : 100)
-    if (pers > 0 && pers < 100) {
-      css.setProp("perspective", `${pers}rem`)
+    const pers = parseFloat(css.getProp("perspective")) + deltaY
+    if (pers > 0) {
+      css.setProp("perspective", `${pers}px`)
     }
   })
 
@@ -64,16 +62,17 @@ window.addEventListener("load", () => {
     switch (code) {
       case "KeyR":
         rotateMode = !rotateMode
-        css.setProp("radius", `${rotateMode ? 0.1 : 0}rem`)
+        css.setProp("radius", `${rotateMode ? edge / 4 : 0}px`)
         dirty = true
         break
       case "KeyQ":
-        translateZ++
-        css.setProp("translateZ", `${translateZ}rem`)
+        console.log({ translateZ, edge })
+        translateZ += edge
+        css.setProp("translateZ", `${translateZ}px`)
         break
       case "KeyE":
-        translateZ--
-        css.setProp("translateZ", `${translateZ}rem`)
+        translateZ -= edge
+        css.setProp("translateZ", `${translateZ}px`)
         break
       case "KeyA":
       case "ArrowLeft":
@@ -82,7 +81,7 @@ window.addEventListener("load", () => {
           css.setProp("rotateZ", `${rotateZ}deg`)
         } else {
           translateX -= edge
-          css.setProp("translateX", `${translateX}rem`)
+          css.setProp("translateX", `${translateX}px`)
         }
         break
       case "KeyD":
@@ -92,7 +91,7 @@ window.addEventListener("load", () => {
           css.setProp("rotateZ", `${rotateZ}deg`)
         } else {
           translateX += edge
-          css.setProp("translateX", `${translateX}rem`)
+          css.setProp("translateX", `${translateX}px`)
         }
         break
       case "KeyW":
@@ -102,7 +101,7 @@ window.addEventListener("load", () => {
           css.setProp("rotateX", `${rotateX}deg`)
         } else {
           translateY -= edge
-          css.setProp("translateY", `${translateY}rem`)
+          css.setProp("translateY", `${translateY}px`)
         }
         break
       case "KeyS":
@@ -112,7 +111,7 @@ window.addEventListener("load", () => {
           css.setProp("rotateX", `${rotateX}deg`)
         } else {
           translateY += edge
-          css.setProp("translateY", `${translateY}rem`)
+          css.setProp("translateY", `${translateY}px`)
         }
         break
     }
