@@ -6,6 +6,8 @@ import { calcPercent } from "./utils"
 window.addEventListener("load", () => {
   const container = document.querySelector<HTMLElement>(".container")
 
+  let current = level.dimensions.floor
+
   css.initProps(container)({
     perspective: "800px",
     mouseX: "50%",
@@ -13,13 +15,14 @@ window.addEventListener("load", () => {
 
     edge: "100px",
 
-    cols: level.level.cols.toString(),
-    rows: level.level.rows.toString(),
-    floor: level.level.floor.toString(),
+    cols: level.dimensions.cols.toString(),
+    rows: level.dimensions.rows.toString(),
+    floor: level.dimensions.floor.toString(),
 
     translateX: "0px",
     translateY: "0px",
-    translateZ: (100 * level.level.floor) + "px", // "calc(var(--edge) * var(--floor))",
+    // translateZ: 100 * level.dimensions.floor + "px", // "calc(var(--edge) * var(--floor))",
+    current: current.toString(),
 
     rotateX: "0deg",
     rotateZ: "0deg",
@@ -27,7 +30,7 @@ window.addEventListener("load", () => {
   })
 
   level.generateLevel(container)
-  // level.observeResize(containerEl)
+  level.observeResize(container)
   input.listenInputs()
 
   input.pipeline.mousemove.push(({ buttons, clientX, clientY }) => {
@@ -48,16 +51,17 @@ window.addEventListener("load", () => {
 
   let rotateMode = false
   let dirty = false
-  input.pipeline.keydown.push(({ code }) => {
+  input.pipeline.keydown.push(({ code, altKey }) => {
     if (dirty) {
       return
     }
     const edge = parseFloat(css.getProp("edge"))
     let translateX = parseFloat(css.getProp("translateX"))
     let translateY = parseFloat(css.getProp("translateY"))
-    let translateZ = parseFloat(css.getProp("translateZ"))
+    // let translateZ = parseFloat(css.getProp("translateZ"))
     let rotateX = parseInt(css.getProp("rotateX"), 10)
     let rotateZ = parseInt(css.getProp("rotateZ"), 10)
+    const isRotation = (!altKey || !rotateMode) && (altKey || rotateMode)
 
     switch (code) {
       case "KeyR":
@@ -66,27 +70,29 @@ window.addEventListener("load", () => {
         dirty = true
         break
       case "KeyQ":
-        console.log({ translateZ, edge })
-        translateZ += edge
-        css.setProp("translateZ", `${translateZ}px`)
+        // translateZ += edge
+        // css.setProp("translateZ", `${translateZ}px`)
+        css.setProp("current", (++current).toString())
         break
       case "KeyE":
-        translateZ -= edge
-        css.setProp("translateZ", `${translateZ}px`)
+        // translateZ -= edge
+        // css.setProp("translateZ", `${translateZ}px`)
+        css.setProp("current", (--current).toString())
         break
       case "KeyA":
       case "ArrowLeft":
-        if (rotateMode) {
+        if (isRotation) {
           rotateZ -= 90
           css.setProp("rotateZ", `${rotateZ}deg`)
         } else {
           translateX -= edge
           css.setProp("translateX", `${translateX}px`)
         }
+        return true
         break
       case "KeyD":
       case "ArrowRight":
-        if (rotateMode) {
+        if (isRotation) {
           rotateZ += 90
           css.setProp("rotateZ", `${rotateZ}deg`)
         } else {
@@ -96,17 +102,18 @@ window.addEventListener("load", () => {
         break
       case "KeyW":
       case "ArrowUp":
-        if (rotateMode) {
+        if (isRotation) {
           rotateX += 90
           css.setProp("rotateX", `${rotateX}deg`)
         } else {
           translateY -= edge
           css.setProp("translateY", `${translateY}px`)
         }
+        return true
         break
       case "KeyS":
       case "ArrowDown":
-        if (rotateMode) {
+        if (isRotation) {
           rotateX -= 90
           css.setProp("rotateX", `${rotateX}deg`)
         } else {
@@ -114,11 +121,17 @@ window.addEventListener("load", () => {
           css.setProp("translateY", `${translateY}px`)
         }
         break
+      default:
+        return false
     }
+    return true
   })
+
   input.pipeline.keyup.push(({ code }) => {
     if (code === "KeyR") {
       dirty = false
     }
   })
+
+  container.querySelector(".block").classList.add(level.getBlock())
 })

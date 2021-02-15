@@ -13,11 +13,10 @@ export const pipeline: Pipeline = {
 
 const listen = (event: string) => {
   const piper = (ev: UIEvent) => {
-    // if (ev.preventDefault !== undefined) {
-    //   ev.preventDefault()
-    // }
     for (const pipe of pipeline[event]) {
-      pipe(ev)
+      if (pipe(ev) && ev.preventDefault !== undefined) {
+        ev.preventDefault()
+      }
     }
   }
   document.addEventListener(event, piper)

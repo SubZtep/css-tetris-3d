@@ -101,7 +101,6 @@ body {
 
 .cube {
   transform-style: preserve-3d;
-  transform: translateX(var(--translateX)) translateY(var(--translateY)) rotateX(var(--rotateX)) rotateZ(var(--rotateZ));
   transition: 300ms ease-out;
   width: 100%;
   height: 100%;
@@ -131,16 +130,62 @@ body {
 }
 
 .block {
+  --translateZ: calc(var(--current) * var(--edge));
+
   width: calc(var(--edge) * 4);
   height: calc(var(--edge) * 4);
   transform-style: preserve-3d;
-  transform: translateZ(var(--translateZ));
-  transition: 300ms ease-in-out;
-
+  transform: translate3d(var(--translateX), var(--translateY), var(--translateZ)) rotateX(var(--rotateX)) rotateZ(var(--rotateZ));
+  transition: 300ms ease-out;
   display: grid;
-  grid-template-areas:
-    "a b . ."
-    ". c d ."
-    ". . . ."
-    ". . . ."
+
+  &.orangeRick {
+    grid-template-areas:
+      ". . . ."
+      ". . . a"
+      ". b c d"
+      ". . . ."
+  }
+  &.hero {
+    grid-template-areas:
+      ". . . ."
+      ". . . ."
+      "a b c d"
+      ". . . ."
+  }
+  &.blueRick {
+    grid-template-areas:
+      ". . . ."
+      "a . . ."
+      "b c d ."
+      ". . . ."
+  }
+  &.teeWee {
+    grid-template-areas:
+      ". . . ."
+      ". a . ."
+      "b c d ."
+      ". . . ."
+  }
+  &.clevelandZ {
+    grid-template-areas:
+      ". . . ."
+      "a b . ."
+      ". c d ."
+      ". . . ."
+  }
+  &.smashboy {
+    grid-template-areas:
+      ". . . ."
+      "a b . ."
+      "c d . ."
+      ". . . ."
+  }
+  &.rhodeIslandZ {
+    grid-template-areas:
+      ". . . ."
+      ". a b ."
+      "c d . ."
+      ". . . ."
+  }
 }
