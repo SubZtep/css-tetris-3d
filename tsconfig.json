@@ -6,13 +6,18 @@
     "moduleResolution": "Node",
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "sourceMap": true
-    // "isolatedModules": true,
-    // "types": ["vite/client"]
+    "sourceMap": true,
+    "baseUrl": ".",
+    "typeRoots": [
+      "./src/types.d.t",
+      "node_modules/@types"
+    ]
   },
   "include": [
     "imports.ts",
     "src/**/*.ts",
-    "playwright/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
   ]
 }

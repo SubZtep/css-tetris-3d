@@ -1,6 +1,5 @@
 let ticking = false
 const tempProps = new Map<string, string>()
-
 let styleContainer: CSSStyleDeclaration
 
 const mutateProps = () => {

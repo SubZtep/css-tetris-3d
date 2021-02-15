@@ -7,53 +7,102 @@ export const dimensions = {
   floor: 4,
 }
 
-const blocks = ["orangeRick", "hero", "blueRick", "teeWee", "clevelandZ", "smashboy", "rhodeIslandZ"] as const
+export const blocks = {
+  orangeRick: [
+    [0, 0, 0, 1],
+    [0, 1, 1, 1],
+  ],
+  hero: [
+    [0, 0, 0, 0],
+    [1, 1, 1, 1],
+  ],
+  blueRick: [
+    [1, 0, 0, 0],
+    [1, 1, 1, 0],
+  ],
+  teeWee: [
+    [0, 1, 0, 0],
+    [1, 1, 1, 0],
+  ],
+  clevelandZ: [
+    [1, 1, 0, 0],
+    [0, 1, 1, 0],
+  ],
+  smashboy: [
+    [1, 1, 0, 0],
+    [1, 1, 0, 0],
+  ],
+  rhodeIslandZ: [
+    [0, 1, 1, 0],
+    [1, 1, 0, 0],
+  ],
+}
 
-type Block = typeof blocks[number]
-type Side = "back" | "right" | "left" | "top" | "bottom"
+interface GameState {
+  rotateMode: boolean
+  currentFloor: number
+  block: Block
+  posX: number
+  posY: number
+  rotX: number
+  rotZ: number
+}
 
-export const generateLevel = (container: HTMLElement): void => {
-  Object.keys(dimensions).forEach(key => setProp(key, dimensions[key]))
+type Block = keyof typeof blocks
+type StateProp = keyof GameState
+type StateVal = GameState[StateProp]
 
-  container.querySelectorAll(".level .side").forEach(el => {
-    const frag = document.createDocumentFragment()
-    const side = el.classList.item(1) as Side
-    const tileCount =
-      side === "back"
-        ? dimensions.cols * dimensions.rows
-        : dimensions.floor * (["top", "bottom"].includes(side) ? dimensions.cols : dimensions.rows)
+const getNextBlock = (): Block => getRandomItem<string>(Object.keys(blocks)) as Block
 
-    for (let i = 0; i < tileCount; i++) {
-      const tile = document.createElement("div")
-      switch (side) {
-        case "top":
-          tile.classList.add("floor-" + Math.floor(i / dimensions.cols))
-          break
-        case "bottom":
-          tile.classList.add("floor-" + (dimensions.floor - Math.floor(i / dimensions.cols) - 1))
-          break
-        case "left":
-          tile.classList.add("floor-" + (i % dimensions.floor))
-          break
-        case "right":
-          tile.classList.add("floor-" + (dimensions.floor - (i % dimensions.floor) - 1))
-          break
-      }
-      frag.appendChild(tile)
+export let state: GameState = {
+  rotateMode: false,
+  currentFloor: dimensions.floor,
+  block: getNextBlock(),
+  posX: 0,
+  posY: 0,
+  rotX: 0,
+  rotZ: 0,
+}
+
+/** Should be in layout.ts */
+export const parseState: ProxyHandler<GameState> = {
+  set: (target: GameState, property: StateProp, value: StateVal): boolean => {
+    if (property === "block") {
+      const cubes = ["a", "b", "c", "d"]
+      setProp(
+        "block-template",
+        blocks[value as Block]
+          .map(row => '"' + row.map(item => (item === 1 ? cubes.shift() : ".")).join(" ") + '"')
+          .join(" ")
+      )
+    } else {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      target[property as Exclude<StateProp, "block">] = value as number | boolean
+      setProp(property, value.toString())
     }
-    el.appendChild(frag)
-  })
+
+    return true
+  },
 }
 
-export const observeResize = (containerEl: HTMLElement): void => {
-  new ResizeObserver(([{ contentRect }]) => {
-    const { width, height } = contentRect
-    const minWidth = Math.min(width / dimensions.cols, height / dimensions.rows)
-    setProp("edge", minWidth / dimensions.floor + "px")
-  }).observe(containerEl)
+state = new Proxy(state, parseState)
+
+export const resetState = (): void => {
+  state.currentFloor = dimensions.floor
+  state.block = getNextBlock()
+  state.posX = 0
+  state.posY = 0
+  state.rotX = 0
+  state.rotZ = 0
 }
 
 
-export const getBlock = (): Block => {
-  return getRandomItem(blocks)
+export const moveBlock = (forwards = true): void => {
+  const nextFloor = state.currentFloor + (forwards ? -1 : 1)
+  if (nextFloor < 0) {
+    resetState()
+    return
+  }
+  state.currentFloor = nextFloor
 }

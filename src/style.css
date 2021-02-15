@@ -27,14 +27,12 @@ body {
   justify-content: center;
 
   perspective: var(--perspective);
-  perspective-origin: calc(100% - var(--mouseX)) calc(100% - var(--mouseY));
+  perspective-origin: calc(100% - var(--perspectiveX)) calc(100% - var(--perspectiveY));
 }
 
 
 .front {
   transform: translateZ(var(--edge));
-}
-.back {
 }
 .right {
   transform-origin: right;
@@ -130,62 +128,17 @@ body {
 }
 
 .block {
-  --translateZ: calc(var(--current) * var(--edge));
+  --translateX: calc(var(--posX) * var(--edge));
+  --translateY: calc(var(--posY) * var(--edge));
+  --translateZ: calc(var(--currentFloor) * var(--edge));
+  --rotateX: calc(var(--rotX) * 1deg);
+  --rotateZ: calc(var(--rotZ) * 1deg);
 
   width: calc(var(--edge) * 4);
-  height: calc(var(--edge) * 4);
+  height: calc(var(--edge) * 2);
   transform-style: preserve-3d;
   transform: translate3d(var(--translateX), var(--translateY), var(--translateZ)) rotateX(var(--rotateX)) rotateZ(var(--rotateZ));
   transition: 300ms ease-out;
   display: grid;
-
-  &.orangeRick {
-    grid-template-areas:
-      ". . . ."
-      ". . . a"
-      ". b c d"
-      ". . . ."
-  }
-  &.hero {
-    grid-template-areas:
-      ". . . ."
-      ". . . ."
-      "a b c d"
-      ". . . ."
-  }
-  &.blueRick {
-    grid-template-areas:
-      ". . . ."
-      "a . . ."
-      "b c d ."
-      ". . . ."
-  }
-  &.teeWee {
-    grid-template-areas:
-      ". . . ."
-      ". a . ."
-      "b c d ."
-      ". . . ."
-  }
-  &.clevelandZ {
-    grid-template-areas:
-      ". . . ."
-      "a b . ."
-      ". c d ."
-      ". . . ."
-  }
-  &.smashboy {
-    grid-template-areas:
-      ". . . ."
-      "a b . ."
-      "c d . ."
-      ". . . ."
-  }
-  &.rhodeIslandZ {
-    grid-template-areas:
-      ". . . ."
-      ". a b ."
-      "c d . ."
-      ". . . ."
-  }
+  grid-template-areas: var(--block-template)
 }
