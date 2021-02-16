@@ -1,7 +1,7 @@
-import { pipeline } from "./input"
-import { dimensions } from "./level"
-import { calcPercent } from "./utils"
-import { getProp, setProp } from "./css"
+import { pipeline } from "./lib/events"
+import { calcPercent } from "./lib/utils"
+import { getProp, setProp } from "./lib/css"
+import { dimensions, state, moveBlock } from "./game"
 
 export const defaultCSSProps = (): { [prop: string]: string } =>
   Object.assign(
@@ -15,6 +15,8 @@ export const defaultCSSProps = (): { [prop: string]: string } =>
     ...Object.entries(dimensions).map(([key, value]) => ({ [key]: value.toString() }))
   )
 
+type LevelSide = "back" | "right" | "left" | "top" | "bottom"
+
 export const createLevel = (container: HTMLElement): void => {
   const { cols, rows, floor } = dimensions
 
@@ -22,6 +24,7 @@ export const createLevel = (container: HTMLElement): void => {
     const frag = document.createDocumentFragment()
     const side = el.classList.item(1) as LevelSide
     const tileCount = side === "back" ? cols * rows : floor * (["top", "bottom"].includes(side) ? cols : rows)
+
     for (let i = 0; i < tileCount; i++) {
       const tile = document.createElement("div")
       let nr: number
@@ -38,13 +41,19 @@ export const createLevel = (container: HTMLElement): void => {
         case "right":
           nr = floor - (i % floor) - 1
           break
-        default:
       }
+
       tile.classList.add(`floor-${nr ?? "backwall"}`)
       frag.appendChild(tile)
     }
     el.appendChild(frag)
   })
+}
+
+export const composeGridTemplate = (blockData: number[][]): string => {
+  const cubeAreas = ["a", "b", "c", "d"]
+  const templateRow = (row: number[]) => `"${row.map(area => (area === 1 ? cubeAreas.shift() : ".")).join(" ")}"`
+  return blockData.map(templateRow).join(" ")
 }
 
 /**
@@ -85,5 +94,50 @@ export const handlePerspectiveMutates = (container: HTMLElement): void => {
     if (pers > 0) {
       setProp("perspective", `${pers}px`)
     }
+  })
+}
+
+export const handleGameInput = (): void => {
+  pipeline.keydown.push(({ code, altKey, ctrlKey }) => {
+    if (ctrlKey) return false
+    const isRotation = (!altKey || !state.rotateMode) && (altKey || state.rotateMode)
+
+    switch (code) {
+      case "KeyR":
+        state.rotateMode = !state.rotateMode
+        break
+
+      case "KeyQ":
+        moveBlock(false)
+        break
+
+      case "KeyE":
+        moveBlock()
+        break
+
+      case "KeyA":
+      case "ArrowLeft":
+        isRotation ? (state.rotZ -= 90) : state.posX--
+        break
+
+      case "KeyD":
+      case "ArrowRight":
+        isRotation ? (state.rotZ += 90) : state.posX++
+        break
+
+      case "KeyW":
+      case "ArrowUp":
+        isRotation ? (state.rotX += 90) : state.posY--
+        break
+
+      case "KeyS":
+      case "ArrowDown":
+        isRotation ? (state.rotX -= 90) : state.posY++
+        break
+
+      default:
+        return false
+    }
+    return true
   })
 }

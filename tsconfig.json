@@ -7,11 +7,7 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "sourceMap": true,
-    "baseUrl": ".",
-    "typeRoots": [
-      "./src/types.d.t",
-      "node_modules/@types"
-    ]
+    "baseUrl": "."
   },
   "include": [
     "imports.ts",

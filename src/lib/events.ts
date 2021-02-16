@@ -1,3 +1,7 @@
+type Pipeline = {
+  [EventType in keyof DocumentEventMap]?: ((ev: DocumentEventMap[EventType]) => boolean | void)[]
+}
+
 export const pipeline: Pipeline = {
   mousemove: [],
   keydown: [],
@@ -17,4 +21,4 @@ const listen = (event: keyof Pipeline) => {
   })
 }
 
-export const listenInputs = (): void => Reflect.ownKeys(pipeline).forEach(listen)
+export const initListeners = (): void => Reflect.ownKeys(pipeline).forEach(listen)

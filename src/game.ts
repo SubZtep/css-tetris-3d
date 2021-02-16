@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { getProp, setProp } from "./css"
-import { getRandomItem } from "./utils"
+import { composeGridTemplate } from "./layout"
+import { getProp, setProp } from "./lib/css"
+import { getRandomItem } from "./lib/utils"
 
 export const dimensions = {
   cols: 6,
@@ -52,12 +53,6 @@ interface GameState {
 type Block = keyof typeof blocks
 type StateProp = keyof GameState
 type StateVal = GameState[StateProp]
-
-const composeGridTemplate = (blockData: number[][]) => {
-  const cubeAreas = ["a", "b", "c", "d"]
-  const templateRow = (row: number[]) => `"${row.map(area => (area === 1 ? cubeAreas.shift() : ".")).join(" ")}"`
-  return blockData.map(templateRow).join(" ")
-}
 
 export const handleCSSProps: ProxyHandler<GameState> = {
   set: (target: GameState, p: StateProp, value: StateVal) => {
