@@ -1,10 +1,11 @@
-import { setProp } from "./css"
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+import { getProp, setProp } from "./css"
 import { getRandomItem } from "./utils"
 
 export const dimensions = {
-  cols: 4,
-  rows: 4,
-  floor: 4,
+  cols: 6,
+  rows: 6,
+  floor: 8,
 }
 
 export const blocks = {
@@ -52,41 +53,38 @@ type Block = keyof typeof blocks
 type StateProp = keyof GameState
 type StateVal = GameState[StateProp]
 
-const getNextBlock = (): Block => getRandomItem<string>(Object.keys(blocks)) as Block
-
-export let state: GameState = {
-  rotateMode: false,
-  currentFloor: dimensions.floor,
-  block: getNextBlock(),
-  posX: 0,
-  posY: 0,
-  rotX: 0,
-  rotZ: 0,
+const composeGridTemplate = (blockData: number[][]) => {
+  const cubeAreas = ["a", "b", "c", "d"]
+  const templateRow = (row: number[]) => `"${row.map(area => (area === 1 ? cubeAreas.shift() : ".")).join(" ")}"`
+  return blockData.map(templateRow).join(" ")
 }
 
-/** Should be in layout.ts */
-export const parseState: ProxyHandler<GameState> = {
-  set: (target: GameState, property: StateProp, value: StateVal): boolean => {
-    if (property === "block") {
-      const cubes = ["a", "b", "c", "d"]
-      setProp(
-        "block-template",
-        blocks[value as Block]
-          .map(row => '"' + row.map(item => (item === 1 ? cubes.shift() : ".")).join(" ") + '"')
-          .join(" ")
-      )
-    } else {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      target[property as Exclude<StateProp, "block">] = value as number | boolean
-      setProp(property, value.toString())
+export const handleCSSProps: ProxyHandler<GameState> = {
+  set: (target: GameState, p: StateProp, value: StateVal) => {
+    switch (p) {
+      case "block":
+        setProp("block-template", composeGridTemplate(blocks[value as Block]))
+        return true
+      case "rotateMode":
+        setProp("radius", `${value ? parseFloat(getProp("edge")) / 4 : 0}px`)
+        break
+      default:
+        setProp(p, value.toString())
     }
-
+    // @ts-ignore
+    target[p] = value
     return true
   },
 }
 
-state = new Proxy(state, parseState)
+// @ts-ignore
+export let state: GameState = {
+  rotateMode: false,
+}
+
+state = new Proxy(state, handleCSSProps)
+
+const getNextBlock = () => getRandomItem(Reflect.ownKeys(blocks) as Block[])
 
 export const resetState = (): void => {
   state.currentFloor = dimensions.floor
@@ -96,7 +94,6 @@ export const resetState = (): void => {
   state.rotX = 0
   state.rotZ = 0
 }
-
 
 export const moveBlock = (forwards = true): void => {
   const nextFloor = state.currentFloor + (forwards ? -1 : 1)

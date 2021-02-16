@@ -1,20 +1,20 @@
 export const pipeline: Pipeline = {
   mousemove: [],
-  wheel: [],
   keydown: [],
+  wheel: [],
 }
 
-const listen = (event: string) => {
-  const piper = (ev: UIEvent) => {
+const passiveEventListeners: (keyof Pipeline)[] = ["wheel"]
+
+const listen = (event: keyof Pipeline) => {
+  document.addEventListener(event, ev => {
     for (const pipe of pipeline[event]) {
-      if (pipe(ev) && ev.preventDefault !== undefined) {
+      Reflect.apply(pipe, undefined, [ev]) &&
+        !passiveEventListeners.includes(event) &&
+        Reflect.has(ev, "preventDefault") &&
         ev.preventDefault()
-      }
     }
-  }
-  document.addEventListener(event, piper)
+  })
 }
 
-export const listenInputs = (): void => {
-  Object.keys(pipeline).forEach(listen)
-}
+export const listenInputs = (): void => Reflect.ownKeys(pipeline).forEach(listen)
