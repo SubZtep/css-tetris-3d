@@ -1,6 +1,6 @@
 import { pipeline } from "./lib/events"
 import { calcPercent } from "./lib/utils"
-import { getProp, setProp } from "./lib/css"
+import { getProp, setProp, setProps } from "./lib/css"
 import { dimensions, state, moveBlock } from "./game"
 
 export const defaultCSSProps = (): { [prop: string]: string } =>
@@ -76,33 +76,36 @@ export const handleWindowResize = (container: HTMLElement): void =>
  */
 export const handlePerspectiveMutates = (container: HTMLElement): void => {
   pipeline.mouseup.push(() => {
-    setProp("perspectiveX", "50%")
-    setProp("perspectiveY", "50%")
+    setProps({
+      perspectiveX: "50%",
+      perspectiveY: "50%",
+    })
   })
 
   pipeline.mousemove.push(({ buttons, clientX, clientY }) => {
     if (buttons === 1) {
       const { clientWidth, clientHeight } = container
+      const fastPcToEdge = 20
+      const fastMulti = 1.6
 
       let px = calcPercent(clientWidth, clientX)
-      let py = calcPercent(clientHeight, clientY)
-
-      const fastPcToEdge = 25
-      const fastMulti = 1.75
-
       if (px > 100 - fastPcToEdge) {
         px += Math.pow(Math.abs(100 - fastPcToEdge - px), fastMulti)
       } else if (px < fastPcToEdge) {
         px -= Math.pow(fastPcToEdge - px, fastMulti)
       }
+
+      let py = calcPercent(clientHeight, clientY)
       if (py > 100 - fastPcToEdge) {
         py += Math.pow(Math.abs(100 - fastPcToEdge - py), fastMulti)
       } else if (py < fastPcToEdge) {
         py -= Math.pow(fastPcToEdge - py, fastMulti)
       }
 
-      setProp("perspectiveX", 100 - px + "%")
-      setProp("perspectiveY", 100 - py + "%")
+      setProps({
+        perspectiveX: `${100 - px}%`,
+        perspectiveY: `${100 - py}%`,
+      })
       return true
     }
     return false

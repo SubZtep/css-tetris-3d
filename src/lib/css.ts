@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 let ticking = false
 const tempProps = new Map<string, string>()
 let styleContainer: CSSStyleDeclaration
@@ -17,25 +18,31 @@ const requestTick = () => {
   ticking = true
 }
 
-export const setProp = (property: string, value: string | number): void => {
-  tempProps.set(property, String(value) )
+export const setProp = (property: string, value: string): void => {
+  tempProps.set(property, value)
+  requestTick()
+}
+
+export const setProps = (properties: { [property: string]: string }): void => {
+  for (const [property, value] of Object.entries(properties)) {
+    tempProps.set(property, value)
+  }
   requestTick()
 }
 
 export const getProp = <T = string>(property: string, parser?: (value: string) => T): T => {
   const prop = styleContainer.getPropertyValue(`--${property}`)
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   return parser === undefined ? prop : parser(prop)
 }
 
-const setProps = (vars: { [property: string]: string }): void => {
-  for (const [property, value] of Object.entries(vars)) {
+const setPropsImmediate = (properties: { [property: string]: string }): void => {
+  for (const [property, value] of Object.entries(properties)) {
     styleContainer.setProperty(`--${property}`, value)
   }
 }
 
-export const initProps = (container: HTMLElement): typeof setProps => {
+export const initProps = (container: HTMLElement): typeof setPropsImmediate => {
   styleContainer = container.style
-  return setProps
+  return setPropsImmediate
 }
