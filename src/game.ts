@@ -64,7 +64,7 @@ export const handleCSSProps: ProxyHandler<GameState> = {
         setProp("radius", `${value ? parseFloat(getProp("edge")) / 4 : 0}px`)
         break
       default:
-        setProp(p, value.toString())
+        setProp(p, String(value))
     }
     // @ts-ignore
     target[p] = value
@@ -72,10 +72,9 @@ export const handleCSSProps: ProxyHandler<GameState> = {
   },
 }
 
-// @ts-ignore
 export let state: GameState = {
   rotateMode: false,
-}
+} as GameState
 
 state = new Proxy(state, handleCSSProps)
 

@@ -17,12 +17,17 @@ const requestTick = () => {
   ticking = true
 }
 
-export const setProp = (property: string, value: string): void => {
-  tempProps.set(property, value)
+export const setProp = (property: string, value: string | number): void => {
+  tempProps.set(property, String(value) )
   requestTick()
 }
 
-export const getProp = (property: string): string => styleContainer.getPropertyValue(`--${property}`)
+export const getProp = <T = string>(property: string, parser?: (value: string) => T): T => {
+  const prop = styleContainer.getPropertyValue(`--${property}`)
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  return parser === undefined ? prop : parser(prop)
+}
 
 const setProps = (vars: { [property: string]: string }): void => {
   for (const [property, value] of Object.entries(vars)) {

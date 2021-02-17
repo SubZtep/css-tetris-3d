@@ -26,7 +26,8 @@ body {
   align-items: center;
   justify-content: center;
   perspective: var(--perspective);
-  perspective-origin: calc(100% - var(--perspectiveX)) calc(100% - var(--perspectiveY));
+  transition: perspective-origin 200ms ease-out;
+  perspective-origin: var(--perspectiveX) var(--perspectiveY);
 }
 
 .front {

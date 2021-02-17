@@ -12,7 +12,7 @@ export const defaultCSSProps = (): { [prop: string]: string } =>
       edge: "100px",
       radius: "0px",
     },
-    ...Object.entries(dimensions).map(([key, value]) => ({ [key]: value.toString() }))
+    ...Object.entries(dimensions).map(([key, value]) => ({ [key]: String(value) }))
   )
 
 type LevelSide = "back" | "right" | "left" | "top" | "bottom"
@@ -75,11 +75,34 @@ export const handleWindowResize = (container: HTMLElement): void =>
  * Set `--perspectiveX`, `--perspectiveY` and `--perspective`
  */
 export const handlePerspectiveMutates = (container: HTMLElement): void => {
+  pipeline.mouseup.push(() => {
+    setProp("perspectiveX", "50%")
+    setProp("perspectiveY", "50%")
+  })
+
   pipeline.mousemove.push(({ buttons, clientX, clientY }) => {
     if (buttons === 1) {
       const { clientWidth, clientHeight } = container
-      setProp("perspectiveX", calcPercent(clientWidth, clientX) + "%")
-      setProp("perspectiveY", calcPercent(clientHeight, clientY) + "%")
+
+      let px = calcPercent(clientWidth, clientX)
+      let py = calcPercent(clientHeight, clientY)
+
+      const fastPcToEdge = 25
+      const fastMulti = 1.75
+
+      if (px > 100 - fastPcToEdge) {
+        px += Math.pow(Math.abs(100 - fastPcToEdge - px), fastMulti)
+      } else if (px < fastPcToEdge) {
+        px -= Math.pow(fastPcToEdge - px, fastMulti)
+      }
+      if (py > 100 - fastPcToEdge) {
+        py += Math.pow(Math.abs(100 - fastPcToEdge - py), fastMulti)
+      } else if (py < fastPcToEdge) {
+        py -= Math.pow(fastPcToEdge - py, fastMulti)
+      }
+
+      setProp("perspectiveX", 100 - px + "%")
+      setProp("perspectiveY", 100 - py + "%")
       return true
     }
     return false
@@ -87,9 +110,7 @@ export const handlePerspectiveMutates = (container: HTMLElement): void => {
 
   pipeline.wheel.push(({ deltaY }) => {
     const persTurn = 100
-    let pers = parseFloat(getProp("perspective"))
-
-    console.log({ pers })
+    let pers = getProp("perspective", parseFloat)
     pers += Math.sign(deltaY) * (pers < persTurn ? 1 : ~~Math.sqrt(pers - persTurn + 1))
     if (pers > 0) {
       setProp("perspective", `${pers}px`)

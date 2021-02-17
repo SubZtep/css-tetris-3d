@@ -2,7 +2,7 @@
   "name": "css-tetris-3d",
   "version": "0.0.0",
   "scripts": {
-    "dev": "vite --port 3333",
+    "start": "vite --port 3333",
     "build": "vite build",
     "serve": "vite preview",
     "lint": "eslint ."
