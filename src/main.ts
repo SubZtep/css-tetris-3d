@@ -8,7 +8,6 @@ window.addEventListener("load", () => {
   css.initProps(container)(layout.defaultCSSProps())
   game.resetState()
 
-  layout.createLevel(container)
   layout.handleWindowResize(container)
   layout.handlePerspectiveMutates(container)
   layout.handleGameInput()

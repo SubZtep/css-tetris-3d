@@ -1,5 +1,5 @@
-mixin cube
-  .cube
+mixin cube(name)
+  .cube(class=name)
     each val in ["front", "back", "right", "left", "top", "bottom"]
       div(class=val)
 
@@ -12,7 +12,7 @@ mixin cube
     .side.bottom
 
     .block
-      +cube
-      +cube
-      +cube
-      +cube
+      +cube("a")
+      +cube("b")
+      +cube("c")
+      +cube("d")

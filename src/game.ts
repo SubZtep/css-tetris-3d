@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { composeGridTemplate } from "./layout"
 import { getProp, setProp } from "./lib/css"
 import { getRandomItem } from "./lib/utils"
 
@@ -58,8 +57,12 @@ export const handleCSSProps: ProxyHandler<GameState> = {
   set: (target: GameState, p: StateProp, value: StateVal) => {
     switch (p) {
       case "block":
-        setProp("block-template", composeGridTemplate(blocks[value as Block]))
-        return true
+        if (state.block) {
+          document.querySelector(".block").classList.replace(state.block, value as Block)
+        } else {
+          document.querySelector(".block").classList.add(value as Block)
+        }
+        break
       case "rotateMode":
         setProp("radius", `${value ? parseFloat(getProp("edge")) / 4 : 0}px`)
         break

@@ -15,47 +15,6 @@ export const defaultCSSProps = (): { [prop: string]: string } =>
     ...Object.entries(dimensions).map(([key, value]) => ({ [key]: String(value) }))
   )
 
-type LevelSide = "back" | "right" | "left" | "top" | "bottom"
-
-export const createLevel = (container: HTMLElement): void => {
-  const { cols, rows, floor } = dimensions
-
-  container.querySelectorAll(".level .side").forEach(el => {
-    const frag = document.createDocumentFragment()
-    const side = el.classList.item(1) as LevelSide
-    const tileCount = side === "back" ? cols * rows : floor * (["top", "bottom"].includes(side) ? cols : rows)
-
-    for (let i = 0; i < tileCount; i++) {
-      const tile = document.createElement("div")
-      let nr: number
-      switch (side) {
-        case "top":
-          nr = Math.floor(i / cols)
-          break
-        case "bottom":
-          nr = floor - Math.floor(i / cols) - 1
-          break
-        case "left":
-          nr = i % floor
-          break
-        case "right":
-          nr = floor - (i % floor) - 1
-          break
-      }
-
-      tile.classList.add(`floor-${nr ?? "backwall"}`)
-      frag.appendChild(tile)
-    }
-    el.appendChild(frag)
-  })
-}
-
-export const composeGridTemplate = (blockData: number[][]): string => {
-  const cubeAreas = ["a", "b", "c", "d"]
-  const templateRow = (row: number[]) => `"${row.map(area => (area === 1 ? cubeAreas.shift() : ".")).join(" ")}"`
-  return blockData.map(templateRow).join(" ")
-}
-
 /**
  * Set `--edge` size
  */

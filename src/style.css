@@ -53,45 +53,53 @@ body {
 .level {
   background-color: #000300;
   transform-style: preserve-3d;
+  position: absolute;
 
   --dimension: calc(max(var(--cols), var(--rows)) * var(--edge));
   width: var(--dimension);
   height: var(--dimension);
+  --edge-px: calc(var(--edge) * 1px);
+  --edge--px: calc(var(--edge) - 2px);
 
   .side {
     width: 100%;
     height: 100%;
-
-    display: grid;
     position: absolute;
 
-    &.back {
-      grid-template-columns: repeat(var(--cols), 1fr);
-      grid-template-rows: repeat(var(--rows), 1fr);
-    }
-    &.left, &.right {
-      grid-template-columns: repeat(var(--floor), 1fr);
-      grid-template-rows: repeat(var(--rows), 1fr);
-    }
-    &.top, &.bottom {
-      grid-template-columns: repeat(var(--cols), 1fr);
-      grid-template-rows: repeat(var(--floor), 1fr);
-    }
+    background-image:
+      repeating-linear-gradient(to right, transparent, transparent var(--edge--px), #f006 var(--edge)),
+      repeating-linear-gradient(to bottom, transparent, transparent var(--edge--px), #f006 var(--edge));
 
-    > div {
-      border: 1px solid #010;
+    /* &.top {
+      background-image:
+        repeating-linear-gradient(to right, transparent, transparent var(--edge--px), #f006 var(--edge)),
+        repeating-linear-gradient(to bottom, transparent, transparent var(--edge--px), #f006 var(--edge)),
+        linear-gradient(to top, transparent, transparent 20%, #f002);
     }
-    .floor-0 { border-color: #020; }
-    .floor-1 { border-color: #030; }
-    .floor-2 { border-color: #040; }
-    .floor-3 { border-color: #050; }
-    .floor-4 { border-color: #060; }
-    .floor-5 { border-color: #070; }
-    .floor-6 { border-color: #080; }
-    .floor-7 { border-color: #090; }
-    .floor-8 { border-color: #0a0; }
-    .floor-9 { border-color: #0b0; }
-    .floor-backwall { border: 6px ​inset #8a03036 }
+    &.left {
+      background-image:
+        repeating-linear-gradient(to right, transparent, transparent var(--edge--px), #f006 var(--edge)),
+        repeating-linear-gradient(to bottom, transparent, transparent var(--edge--px), #f006 var(--edge)),
+        linear-gradient(to left, transparent, transparent 20%, #f002);
+    }
+    &.right {
+      background-image:
+        repeating-linear-gradient(to right, transparent, transparent var(--edge--px), #f006 var(--edge)),
+        repeating-linear-gradient(to bottom, transparent, transparent var(--edge--px), #f006 var(--edge)),
+        linear-gradient(to right, transparent, transparent 20%, #f002);
+    }
+    &.bottom {
+      background-image:
+        repeating-linear-gradient(to right, transparent, transparent var(--edge--px), #f006 var(--edge)),
+        repeating-linear-gradient(to bottom, transparent, transparent var(--edge--px), #f006 var(--edge)),
+        linear-gradient(to bottom, transparent, transparent 20%, #f002);
+      }
+    &.back {
+      background-color: #f001;
+      background-image:
+        repeating-linear-gradient(to right, transparent, transparent var(--edge--px), #f006 var(--edge)),
+        repeating-linear-gradient(to bottom, transparent, transparent var(--edge--px), #f006 var(--edge));
+    } */
   }
 }
 
@@ -108,19 +116,20 @@ body {
     background-color: #f00a;
     border: 1px solid #000;
     border-radius: var(--radius);
+    /* backface-visibility: hidden; */
     transition: border-radius 200ms ease-out;
   }
 
-  &:nth-of-type(1) {
+  &.a {
     grid-area: a;
   }
-  &:nth-of-type(2) {
+  &.b {
     grid-area: b;
   }
-  &:nth-of-type(3) {
+  &.c {
     grid-area: c;
   }
-  &:nth-of-type(4) {
+  &.d {
     grid-area: d;
   }
 }
@@ -140,5 +149,65 @@ body {
   transition: 300ms ease-out;
 
   display: grid;
-  grid-template-areas: var(--block-template)
+
+  /* > div {
+    background-color: red;
+  } */
+
+  &.orangeRick {
+    grid-template-areas:
+      ". . . a"
+      ". b c d";
+    .a .bottom, .b .right, .c .left, .c .right, .d .top, .d .left {
+      display: none;
+    }
+  }
+  &.hero {
+    grid-template-areas:
+      ". . . ."
+      "a b c d";
+    .a .right, .b .left, .b .right, .c .left, .c .right, .d .left {
+      display: none;
+    }
+  }
+  &.blueRick {
+    grid-template-areas:
+      "a . . ."
+      "b c d .";
+    .a .bottom, .b .top, .b .right, .c .left, .c .right, .d .left {
+      display: none;
+    }
+  }
+  &.teeWee {
+    grid-template-areas:
+      ". a . ."
+      "b c d .";
+    .a .bottom, .b .right, .c .top, .c .left, .c .right, .d .left {
+      display: none;
+    }
+  }
+  &.clevelandZ {
+    grid-template-areas:
+      "a b . ."
+      ". c d .";
+    .a .right, .b .bottom, .b .left, .c .top, .c .right, .d .left {
+      display: none;
+    }
+  }
+  &.smashboy {
+    grid-template-areas:
+      "a b . ."
+      "c d . .";
+    .a .right, .a .bottom, .b .left, .b .bottom, .c .top, .c .right, .d .top, .d .left {
+      display: none;
+    }
+  }
+  &.rhodeIslandZ {
+    grid-template-areas:
+      ". a b ."
+      "c d . .";
+    .a .right, .a .bottom, .b .left, .c .right, .d .top, .d .left {
+      display: none;
+    }
+  }
 }
