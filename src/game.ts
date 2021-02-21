@@ -1,12 +1,22 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { getProp, setProp } from "./lib/css"
 import { getRandomItem } from "./lib/utils"
+import { calcView } from "./layout"
 
-export const dimensions = {
-  cols: 6,
-  rows: 6,
-  floor: 8,
+export let dimensions = {
+  cols: 4,
+  rows: 4,
+  floors: 4,
 }
+
+dimensions = new Proxy(dimensions, {
+  set(target: typeof dimensions, p: keyof typeof dimensions, value: number) {
+    target[p] = value
+    setProp(p, String(value))
+    calcView()
+    return true
+  }
+})
 
 export const blocks = {
   orangeRick: [
@@ -84,7 +94,7 @@ state = new Proxy(state, handleCSSProps)
 const getNextBlock = () => getRandomItem(Reflect.ownKeys(blocks) as Block[])
 
 export const resetState = (): void => {
-  state.currentFloor = dimensions.floor
+  state.currentFloor = dimensions.floors - 1
   state.block = getNextBlock()
   state.posX = 0
   state.posY = 0

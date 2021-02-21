@@ -3,46 +3,57 @@ import { calcPercent } from "./lib/utils"
 import { getProp, setProp, setProps } from "./lib/css"
 import { dimensions, state, moveBlock } from "./game"
 
+let container: HTMLElement
+
+export let view = {
+  edge: 0,
+  perspective: 0
+}
+
+view = new Proxy(view, {
+  set(target: typeof view, p: keyof typeof view, value: number) {
+    target[p] = value
+    setProp(p, `${value}px`)
+    return true
+  }
+})
+
+export const setContainer = (el: HTMLElement): void => {
+  container = el
+  calcView()
+}
+
 export const defaultCSSProps = (): { [prop: string]: string } =>
   Object.assign(
     {
-      perspective: "800px",
       perspectiveX: "50%",
       perspectiveY: "50%",
-      edge: "100px",
       radius: "0px",
     },
     ...Object.entries(dimensions).map(([key, value]) => ({ [key]: String(value) }))
   )
 
-/**
- * Set `--edge` size
- */
-export const handleWindowResize = (container: HTMLElement): void =>
-  new ResizeObserver(
-    ([
-      {
-        contentRect: { width, height },
-      },
-    ]) => {
-      const edge = (Math.min(width / dimensions.cols, height / dimensions.rows) / dimensions.floor) * 2
-      setProp("edge", `${edge}px`)
-    }
-  ).observe(container)
+export const calcView = (): void => {
+  const { clientWidth: w, clientHeight: h } = container
+  const edge = Math.min(w / dimensions.cols, h / dimensions.rows)
+  view.edge = edge / 2
+  view.perspective = dimensions.floors * view.edge * 2
+}
 
-/**
- * Set `--perspectiveX`, `--perspectiveY` and `--perspective`
- */
-export const handlePerspectiveMutates = (container: HTMLElement): void => {
+export const handleWindowResize = (): void =>
+  new ResizeObserver(calcView).observe(container)
+
+export const handlePerspectiveMutates = (): void => {
   pipeline.mouseup.push(() => {
     setProps({
       perspectiveX: "50%",
       perspectiveY: "50%",
     })
+    calcView()
   })
 
   pipeline.mousemove.push(({ buttons, clientX, clientY }) => {
-    if (buttons === 1) {
+    if (buttons === 2) {
       const { clientWidth, clientHeight } = container
       const fastPcToEdge = 20
       const fastMulti = 1.6
@@ -71,9 +82,10 @@ export const handlePerspectiveMutates = (container: HTMLElement): void => {
   })
 
   pipeline.wheel.push(({ deltaY }) => {
-    const persTurn = 100
+    // const persTurn = 100
     let pers = getProp("perspective", parseFloat)
-    pers += Math.sign(deltaY) * (pers < persTurn ? 1 : ~~Math.sqrt(pers - persTurn + 1))
+    pers += Math.sign(deltaY) * 100
+    // pers += Math.sign(deltaY) * (pers < persTurn ? 1 : ~~Math.sqrt(pers - persTurn + 1))
     if (pers > 0) {
       setProp("perspective", `${pers}px`)
     }

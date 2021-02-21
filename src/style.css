@@ -5,7 +5,6 @@
 body {
   margin: 0;
   padding: 0;
-  background: #000;
 }
 
 .crosshair {
@@ -22,9 +21,10 @@ body {
   width: 100vw;
   height: 100vh;
   display: flex;
-  cursor: crosshair;
+  overflow: hidden;
   align-items: center;
   justify-content: center;
+  background-color: #000;
   perspective: var(--perspective);
   transition: perspective-origin 200ms ease-out;
   perspective-origin: var(--perspectiveX) var(--perspectiveY);
@@ -34,72 +34,54 @@ body {
   transform: translateZ(var(--edge));
 }
 .right {
+  right: 0;
   transform-origin: right;
   transform: rotateY(90deg);
 }
 .left {
+  left: 0;
   transform-origin: left;
   transform: rotateY(-90deg);
 }
 .top {
+  top: 0;
   transform-origin: top;
   transform: rotateX(90deg);
 }
 .bottom {
+  bottom: 0;
   transform-origin: bottom;
   transform: rotateX(-90deg);
 }
 
 .level {
-  background-color: #000300;
   transform-style: preserve-3d;
   position: absolute;
 
-  --dimension: calc(max(var(--cols), var(--rows)) * var(--edge));
-  width: var(--dimension);
-  height: var(--dimension);
-  --edge-px: calc(var(--edge) * 1px);
-  --edge--px: calc(var(--edge) - 2px);
+  width: calc(var(--cols) * var(--edge));
+  height: calc(var(--rows) * var(--edge));
+  --edge--px: calc(var(--edge) - 4px);
 
   .side {
-    width: 100%;
-    height: 100%;
     position: absolute;
+    border: 1px solid #a00;
 
     background-image:
-      repeating-linear-gradient(to right, transparent, transparent var(--edge--px), #f006 var(--edge)),
-      repeating-linear-gradient(to bottom, transparent, transparent var(--edge--px), #f006 var(--edge));
+      repeating-linear-gradient(to right, transparent, transparent var(--edge--px), #600 var(--edge)),
+      repeating-linear-gradient(to bottom, transparent, transparent var(--edge--px), #600 var(--edge));
 
-    /* &.top {
-      background-image:
-        repeating-linear-gradient(to right, transparent, transparent var(--edge--px), #f006 var(--edge)),
-        repeating-linear-gradient(to bottom, transparent, transparent var(--edge--px), #f006 var(--edge)),
-        linear-gradient(to top, transparent, transparent 20%, #f002);
-    }
-    &.left {
-      background-image:
-        repeating-linear-gradient(to right, transparent, transparent var(--edge--px), #f006 var(--edge)),
-        repeating-linear-gradient(to bottom, transparent, transparent var(--edge--px), #f006 var(--edge)),
-        linear-gradient(to left, transparent, transparent 20%, #f002);
-    }
-    &.right {
-      background-image:
-        repeating-linear-gradient(to right, transparent, transparent var(--edge--px), #f006 var(--edge)),
-        repeating-linear-gradient(to bottom, transparent, transparent var(--edge--px), #f006 var(--edge)),
-        linear-gradient(to right, transparent, transparent 20%, #f002);
-    }
-    &.bottom {
-      background-image:
-        repeating-linear-gradient(to right, transparent, transparent var(--edge--px), #f006 var(--edge)),
-        repeating-linear-gradient(to bottom, transparent, transparent var(--edge--px), #f006 var(--edge)),
-        linear-gradient(to bottom, transparent, transparent 20%, #f002);
-      }
     &.back {
-      background-color: #f001;
-      background-image:
-        repeating-linear-gradient(to right, transparent, transparent var(--edge--px), #f006 var(--edge)),
-        repeating-linear-gradient(to bottom, transparent, transparent var(--edge--px), #f006 var(--edge));
-    } */
+      width: 100%;
+      height: 100%;
+    }
+    &.top, &.bottom {
+      width: calc(var(--cols) * var(--edge));
+      height: calc(var(--floors) * var(--edge));
+    }
+    &.left, &.right {
+      width: calc(var(--floors) * var(--edge));
+      height: calc(var(--rows) * var(--edge));
+    }
   }
 }
 
@@ -108,6 +90,7 @@ body {
   transition: 300ms ease-out;
   width: 100%;
   height: 100%;
+  position: absolute;
 
   > div {
     width: inherit;
@@ -149,10 +132,6 @@ body {
   transition: 300ms ease-out;
 
   display: grid;
-
-  /* > div {
-    background-color: red;
-  } */
 
   &.orangeRick {
     grid-template-areas:
