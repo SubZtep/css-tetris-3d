@@ -13,6 +13,7 @@ window.addEventListener("load", () => {
   layout.handlePerspectiveMutates()
   layout.handleGameInput()
 
-  game.resetState()
+  game.initBoard()
+  game.resetBlock()
   gui.initGUI()
 })

@@ -2,12 +2,13 @@ import { pipeline } from "./lib/events"
 import { calcPercent } from "./lib/utils"
 import { getProp, setProp, setProps } from "./lib/css"
 import { dimensions, state, liftBlock, rotateX, rotateZ, moveX, moveY } from "./game"
+import { guiWorks } from "./gui"
 
 let container: HTMLElement
 
 export let view = {
   edge: 0,
-  perspective: 0
+  perspective: 0,
 }
 
 view = new Proxy(view, {
@@ -15,7 +16,7 @@ view = new Proxy(view, {
     target[p] = value
     setProp(p, `${value}px`)
     return true
-  }
+  },
 })
 
 export const setContainer = (el: HTMLElement): void => {
@@ -37,16 +38,48 @@ export const calcView = (): void => {
   const { clientWidth: w, clientHeight: h } = container
   const edge = Math.min(w / dimensions.cols, h / dimensions.rows)
   view.edge = edge / 2
-  view.perspective = dimensions.floors * view.edge * 2 * 2
+  view.perspective = dimensions.floors * view.edge * 2 // * 2
 }
 
-export const handleWindowResize = (): void =>
-  new ResizeObserver(calcView).observe(container)
+export const handleWindowResize = (): void => new ResizeObserver(calcView).observe(container)
+
+const perspectiveFollows = ({ buttons, clientX, clientY }) => {
+  if (guiWorks) return
+  if (buttons === 1) {
+    const { clientWidth, clientHeight } = container
+    const fastPcToEdge = 40
+    const fastMulti = 2.2
+
+    let px = calcPercent(clientWidth, clientX)
+    if (px > 100 - fastPcToEdge) {
+      px += Math.pow(Math.abs(100 - fastPcToEdge - px), fastMulti)
+    } else if (px < fastPcToEdge) {
+      px -= Math.pow(fastPcToEdge - px, fastMulti)
+    }
+
+    let py = calcPercent(clientHeight, clientY)
+    if (py > 100 - fastPcToEdge) {
+      py += Math.pow(Math.abs(100 - fastPcToEdge - py), fastMulti)
+    } else if (py < fastPcToEdge) {
+      py -= Math.pow(fastPcToEdge - py, fastMulti)
+    }
+
+    setProps({
+      perspectiveX: `${100 - px}%`,
+      perspectiveY: `${100 - py}%`,
+    })
+    return true
+  }
+  return false
+}
 
 export const handlePerspectiveMutates = (): void => {
-  pipeline.mousedown.push(() => {
-    // setProp("perspective", `${ getProp("perspective", parseFloat) * dimensions.floors}px`)
-    view.perspective = view.perspective * dimensions.floors * 2
+  pipeline.mousedown.push(ev => {
+    if (guiWorks) return
+    if (ev.buttons === 1) {
+      view.perspective = view.perspective * dimensions.floors * 2
+    }
+    perspectiveFollows(ev)
   })
 
   pipeline.mouseup.push(() => {
@@ -57,34 +90,7 @@ export const handlePerspectiveMutates = (): void => {
     calcView()
   })
 
-  pipeline.mousemove.push(({ buttons, clientX, clientY }) => {
-    if (buttons === 2) {
-      const { clientWidth, clientHeight } = container
-      const fastPcToEdge = 20
-      const fastMulti = 1.6
-
-      let px = calcPercent(clientWidth, clientX)
-      if (px > 100 - fastPcToEdge) {
-        px += Math.pow(Math.abs(100 - fastPcToEdge - px), fastMulti)
-      } else if (px < fastPcToEdge) {
-        px -= Math.pow(fastPcToEdge - px, fastMulti)
-      }
-
-      let py = calcPercent(clientHeight, clientY)
-      if (py > 100 - fastPcToEdge) {
-        py += Math.pow(Math.abs(100 - fastPcToEdge - py), fastMulti)
-      } else if (py < fastPcToEdge) {
-        py -= Math.pow(fastPcToEdge - py, fastMulti)
-      }
-
-      setProps({
-        perspectiveX: `${100 - px}%`,
-        perspectiveY: `${100 - py}%`,
-      })
-      return true
-    }
-    return false
-  })
+  pipeline.mousemove.push(perspectiveFollows)
 
   pipeline.wheel.push(({ deltaY }) => {
     // const persTurn = 100

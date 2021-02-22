@@ -2,6 +2,9 @@
 import { getProp, setProp } from "./lib/css"
 import { getRandomItem, rotate2d } from "./lib/utils"
 import { calcView } from "./layout"
+import * as pool from "./lib/pool"
+
+let timer: NodeJS.Timeout
 
 export let dimensions = {
   cols: 4,
@@ -54,6 +57,7 @@ Object.freeze(blocks)
 type Block = keyof typeof blocks
 
 interface GameState {
+  live: boolean
   rotateMode: boolean
   currentFloor: number
   block: Block
@@ -63,7 +67,7 @@ interface GameState {
   rotZ: number
 }
 
-const testRotZ = (z: number, moveX = 0, moveY = 0) => {
+const blockChecker = (z: number, moveX = 0, moveY = 0, higher: (testX: number, testY: number) => boolean) => {
   let tempBlock = blocks[state.block]
   let rot = (state.rotZ + z) / 90
   if (Math.abs(rot) >= 4) {
@@ -76,11 +80,11 @@ const testRotZ = (z: number, moveX = 0, moveY = 0) => {
   switch (rot) {
     case 1:
       moveX -= 2
-      break;
+      break
     case 2:
       moveX -= 4
       moveY -= 2
-      break;
+      break
     case 3:
       moveY -= 4
   }
@@ -92,30 +96,46 @@ const testRotZ = (z: number, moveX = 0, moveY = 0) => {
   for (let x = 0; x < tempBlock[0].length; x++) {
     for (let y = 0; y < tempBlock.length; y++) {
       if (tempBlock[y][x]) {
-        const textX = x + moveX + state.posX
-        const textY = y + moveY + state.posY
-        if (textX < 0 || textX >= dimensions.cols) {
-          return false
-        }
-        if (textY < 0 || textY >= dimensions.rows) {
+        const testX = x + moveX + state.posX
+        const testY = y + moveY + state.posY
+
+        if (!higher(testX, testY)) {
           return false
         }
       }
     }
   }
-
   return true
 }
 
+const testRotZ = (z: number, moveX = 0, moveY = 0) => {
+  return blockChecker(z, moveX, moveY, (testX, testY) => {
+    if (testX < 0 || testX >= dimensions.cols) {
+      return false
+    }
+    if (testY < 0 || testY >= dimensions.rows) {
+      return false
+    }
+    return true
+  })
+}
+
+const canLiftBlock = () => {
+  if (state.currentFloor === 0) return false
+  // console.log(board.map(b => [...b.map(c => c.join(" "))]))
+  return blockChecker(0, 0, 0, (testX, testY) => !board[state.currentFloor - 1][testY][testX])
+}
+
 export const rotateX = (r: -90 | 90): void => {
-  // let x = state.rotX + r
+  let x = state.rotX + r
+  console.log("Rotate X", x)
   // state.rotX = x
 }
 
 export const rotateZ = (r: -90 | 90): boolean => {
   const mayMoves = [0, -1, 1, -2, 2, -3, 3, -4, 4] // FIXME: order based on rotation
-  for (let i of mayMoves) {
-    for (let j of mayMoves) {
+  for (const i of mayMoves) {
+    for (const j of mayMoves) {
       if (testRotZ(r, i, j)) {
         state.posX += i
         state.posY += j
@@ -146,6 +166,12 @@ export const moveY = (d: -1 | 1): boolean => {
 export const handleCSSProps: ProxyHandler<GameState> = {
   set: (target: GameState, p: keyof GameState, value: GameState[keyof GameState]) => {
     switch (p) {
+      case "live":
+        clearInterval(timer)
+        if (value) {
+          timer = setInterval(liftBlock, 3000)
+        }
+        break
       case "block":
         if (state.block) {
           document.querySelector(".block").classList.replace(state.block, value as Block)
@@ -166,6 +192,7 @@ export const handleCSSProps: ProxyHandler<GameState> = {
 }
 
 export let state: GameState = {
+  live: true,
   rotateMode: false,
 } as GameState
 
@@ -173,12 +200,16 @@ state = new Proxy(state, handleCSSProps)
 
 let board: number[][][]
 
-const initBoard = () => {
+export const initBoard = (): void => {
   board = Array.from(
     Array.from({ length: dimensions.floors }, () =>
       Array.from({ length: dimensions.rows }, () => Array.from({ length: dimensions.cols }, () => 0))
     )
   )
+
+  if (state.live) {
+    timer = setInterval(liftBlock, 3000)
+  }
 }
 
 const getNextBlock = (): Block => {
@@ -186,37 +217,47 @@ const getNextBlock = (): Block => {
   return getRandomItem(Reflect.ownKeys(blocks) as Block[])
 }
 
-export const resetState = (): void => {
+export const resetBlock = (): void => {
   state.currentFloor = dimensions.floors - 1
   state.block = getNextBlock()
   state.posX = 0
   state.posY = 0
   state.rotX = 0
   state.rotZ = 0
-  initBoard()
 }
 
 const masonBlock = () => {
-  const b = blocks[state.block]
+  const frag = document.createDocumentFragment()
 
-  for (let row = 0; row < b.length; row++) {
-    for (let col = 0; col < b[row].length; col++) {
-      if (b[row][col] === 1) {
-        board[0][row + state.posY][col + state.posX] = 1
-      }
+  blockChecker(0, 0, 0, (testX, testY) => {
+    board[state.currentFloor][testY][testX] = 1
+    const el = pool.getHTMLElement("mc")
+    el.classList.add(`floor${state.currentFloor}`)
+    el.style.transform = `translate3d(calc(var(--edge) * ${testX}), calc(var(--edge) * ${testY}), calc(var(--edge) * ${state.currentFloor}))`
+    frag.appendChild(el)
+    return true
+  })
+
+  const mason = document.querySelector(".mason")
+  mason.appendChild(frag)
+
+  if (state.currentFloor + 1 === dimensions.floors - 1) {
+    clearInterval(timer)
+    if (!confirm("(×﹏×)\n\nContinue?")) {
+      document.location.href = "https://github.com/SubZtep/css-tetris-3d#readme"
     }
+    pool.removeChildren(mason)
+    dimensions.cols++
+    dimensions.rows++
+    dimensions.floors++
+    initBoard()
   }
-
-  // console.log(board.map(b => [...b.map(c => c.join(" "))])[0])
 }
 
 export const liftBlock = (step = -1): void => {
-  const nextFloor = state.currentFloor + step
-  if (nextFloor < 0) {
-    // test if done
+  state.currentFloor += step
+  if (!canLiftBlock()) {
     masonBlock()
-    resetState()
-    return
+    resetBlock()
   }
-  state.currentFloor = nextFloor
 }
