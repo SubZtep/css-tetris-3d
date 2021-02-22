@@ -58,7 +58,7 @@ type Block = keyof typeof blocks
 
 interface GameState {
   live: boolean
-  rotateMode: boolean
+  rotateMode?: boolean
   currentFloor: number
   block: Block
   posX: number
@@ -192,7 +192,7 @@ export const handleCSSProps: ProxyHandler<GameState> = {
 }
 
 export let state: GameState = {
-  live: true,
+  live: false,
   rotateMode: false,
 } as GameState
 
@@ -243,9 +243,9 @@ const masonBlock = () => {
 
   if (state.currentFloor + 1 === dimensions.floors - 1) {
     clearInterval(timer)
-    if (!confirm("(×﹏×)\n\nContinue?")) {
-      document.location.href = "https://github.com/SubZtep/css-tetris-3d#readme"
-    }
+    // if (!confirm("(×﹏×)\n\nContinue?")) {
+    //   document.location.href = "https://github.com/SubZtep/css-tetris-3d#readme"
+    // }
     pool.removeChildren(mason)
     dimensions.cols++
     dimensions.rows++

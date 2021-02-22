@@ -3,13 +3,23 @@ mixin cube(name)
     each val in ["front", "back", "right", "left", "top", "bottom"]
       div(class=val)
 
+mixin gif
+  img(src="kett.gif")
+  //-iframe.giphy-embed(src="https://giphy.com/embed/uitxOU68NGOCZKeeYq" frameBorder="0" allowFullScreen)
+
 .container.crosshair
+
   .level
     .side.back
+      //- +gif
     .side.right
+      //- +gif
     .side.left
+      //- +gif
     .side.top
+      //- +gif
     .side.bottom
+      //- +gif
 
     .block
       +cube("a")
