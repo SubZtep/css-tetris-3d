@@ -8,9 +8,9 @@ export const initGUI = (): void => {
   gui = new dat.GUI()
 
   const d = gui.addFolder("Dimensions")
-  d.add(game.dimensions, "cols").min(4).step(1).listen()
-  d.add(game.dimensions, "rows").min(4).step(1).listen()
-  d.add(game.dimensions, "floors").min(4).step(1).listen()
+  d.add(game.dimensions, "cols").min(4).step(1)
+  d.add(game.dimensions, "rows").min(4).step(1)
+  d.add(game.dimensions, "floors").min(4).step(1)
   d.open()
 
   const l = gui.addFolder("Layout")

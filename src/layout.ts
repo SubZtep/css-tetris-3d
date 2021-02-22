@@ -1,7 +1,7 @@
 import { pipeline } from "./lib/events"
 import { calcPercent } from "./lib/utils"
 import { getProp, setProp, setProps } from "./lib/css"
-import { dimensions, state, moveBlock } from "./game"
+import { dimensions, state, liftBlock, rotateX, rotateZ, moveX, moveY } from "./game"
 
 let container: HTMLElement
 
@@ -37,13 +37,18 @@ export const calcView = (): void => {
   const { clientWidth: w, clientHeight: h } = container
   const edge = Math.min(w / dimensions.cols, h / dimensions.rows)
   view.edge = edge / 2
-  view.perspective = dimensions.floors * view.edge * 2
+  view.perspective = dimensions.floors * view.edge * 2 * 2
 }
 
 export const handleWindowResize = (): void =>
   new ResizeObserver(calcView).observe(container)
 
 export const handlePerspectiveMutates = (): void => {
+  pipeline.mousedown.push(() => {
+    // setProp("perspective", `${ getProp("perspective", parseFloat) * dimensions.floors}px`)
+    view.perspective = view.perspective * dimensions.floors * 2
+  })
+
   pipeline.mouseup.push(() => {
     setProps({
       perspectiveX: "50%",
@@ -103,31 +108,31 @@ export const handleGameInput = (): void => {
         break
 
       case "KeyQ":
-        moveBlock(false)
+        liftBlock(1)
         break
 
       case "KeyE":
-        moveBlock()
+        liftBlock()
         break
 
       case "KeyA":
       case "ArrowLeft":
-        isRotation ? (state.rotZ -= 90) : state.posX--
+        isRotation ? rotateZ(-90) : moveX(-1)
         break
 
       case "KeyD":
       case "ArrowRight":
-        isRotation ? (state.rotZ += 90) : state.posX++
+        isRotation ? rotateZ(90) : moveX(1)
         break
 
       case "KeyW":
       case "ArrowUp":
-        isRotation ? (state.rotX += 90) : state.posY--
+        isRotation ? rotateX(90) : moveY(-1)
         break
 
       case "KeyS":
       case "ArrowDown":
-        isRotation ? (state.rotX -= 90) : state.posY++
+        isRotation ? rotateX(-90) : moveY(1)
         break
 
       default:

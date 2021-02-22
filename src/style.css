@@ -73,6 +73,7 @@ body {
     &.back {
       width: 100%;
       height: 100%;
+      opacity: 0.3;
     }
     &.top, &.bottom {
       width: calc(var(--cols) * var(--edge));
@@ -131,20 +132,22 @@ body {
   transform: translate3d(var(--translateX), var(--translateY), var(--translateZ)) rotateX(var(--rotateX)) rotateZ(var(--rotateZ));
   transition: 300ms ease-out;
 
+  transform-origin: 0 0 var(--edge);
+
   display: grid;
 
   &.orangeRick {
     grid-template-areas:
-      ". . . a"
-      ". b c d";
+      ". . a ."
+      "b c d .";
     .a .bottom, .b .right, .c .left, .c .right, .d .top, .d .left {
       display: none;
     }
   }
   &.hero {
     grid-template-areas:
-      ". . . ."
-      "a b c d";
+      "a b c d"
+      ". . . .";
     .a .right, .b .left, .b .right, .c .left, .c .right, .d .left {
       display: none;
     }
