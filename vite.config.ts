@@ -5,4 +5,5 @@ console.log()
 
 export default defineConfig({
   plugins: [pugPlugin({ pretty: process.env.NODE_ENV !== "production" })],
+  base: "./"
 })
