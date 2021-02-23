@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 let ticking = false
 const tempProps = new Map<string, string>()
-let styleContainer: CSSStyleDeclaration
+let propsContainer: CSSStyleDeclaration
 
 const mutateProps = () => {
   ticking = false
   for (const [property, value] of tempProps.entries()) {
-    styleContainer.setProperty(`--${property}`, value)
+    propsContainer.setProperty(`--${property}`, value)
   }
   tempProps.clear()
 }
@@ -23,7 +23,14 @@ export const setProp = (property: string, value: string): void => {
   requestTick()
 }
 
-export const setProps = (properties: { [property: string]: string }): void => {
+export const setProps = (properties: { [property: string]: string }, immediate = false): void => {
+  if (immediate) {
+    for (const [property, value] of Object.entries(properties)) {
+      propsContainer.setProperty(`--${property}`, value)
+    }
+    return
+  }
+
   for (const [property, value] of Object.entries(properties)) {
     tempProps.set(property, value)
   }
@@ -31,18 +38,11 @@ export const setProps = (properties: { [property: string]: string }): void => {
 }
 
 export const getProp = <T = string>(property: string, parser?: (value: string) => T): T => {
-  const prop = styleContainer.getPropertyValue(`--${property}`)
+  const prop = propsContainer.getPropertyValue(`--${property}`)
   // @ts-ignore
   return parser === undefined ? prop : parser(prop)
 }
 
-const setPropsImmediate = (properties: { [property: string]: string }): void => {
-  for (const [property, value] of Object.entries(properties)) {
-    styleContainer.setProperty(`--${property}`, value)
-  }
-}
-
-export const initProps = (container: HTMLElement): typeof setPropsImmediate => {
-  styleContainer = container.style
-  return setPropsImmediate
+export const setPropsContainer = (container: CSSStyleDeclaration) => {
+  propsContainer = container
 }

@@ -17,6 +17,7 @@
   ],
   "rules": {
     "prefer-const": "warn",
-    "@typescript-eslint/explicit-module-boundary-types": "warn"
+    "@typescript-eslint/explicit-module-boundary-types": "off",
+    "@typescript-eslint/ban-ts-comment": "off"
   }
 }

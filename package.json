@@ -5,7 +5,7 @@
     "start": "vite --port 3333",
     "build": "vite build",
     "serve": "vite preview",
-    "lint": "eslint ."
+    "lint": "eslint --ignore-path .gitignore . "
   },
   "devDependencies": {
     "@types/dat.gui": "^0.7.6",

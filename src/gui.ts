@@ -1,35 +1,33 @@
 import * as dat from "dat.gui"
-import * as game from "./game"
-import * as layout from "./layout"
+import { state } from "./state"
+import { view } from "./layout"
+import { dimensions } from "./board"
+import { tetrominos } from "./tetromino"
 
 let gui: dat.GUI
-export let guiWorks = false
 
 export const initGUI = (): void => {
   gui = new dat.GUI()
   gui.close()
 
-  gui.domElement.addEventListener("mousedown", () => (guiWorks = true))
-  gui.domElement.addEventListener("mouseup", () => (guiWorks = false))
-
   const d = gui.addFolder("Dimensions")
-  d.add(game.dimensions, "cols").min(4).max(50).step(1).listen()
-  d.add(game.dimensions, "rows").min(4).max(50).step(1).listen()
-  d.add(game.dimensions, "floors").min(4).max(50).step(1).listen()
+  d.add(dimensions, "cols").min(4).max(50).step(1).listen()
+  d.add(dimensions, "rows").min(4).max(50).step(1).listen()
+  d.add(dimensions, "floors").min(4).max(50).step(1).listen()
   d.open()
 
   const l = gui.addFolder("Layout")
-  l.add(layout.view, "edge").min(1).step(1).listen()
-  l.add(layout.view, "perspective").min(0).step(1).listen()
+  l.add(view, "edge").min(1).step(1).listen()
+  l.add(view, "perspective").min(0).step(1).listen()
   l.open()
 
   const s = gui.addFolder("State")
-  s.add(game.state, "live").listen()
-  s.add(game.state, "currentFloor").step(1).listen()
-  s.add(game.state, "tetromino").options(Object.keys(game.tetrominos)).listen()
-  s.add(game.state, "posX").step(1).listen()
-  s.add(game.state, "posY").step(1).listen()
-  s.add(game.state, "rotX").step(1).listen()
-  s.add(game.state, "rotZ").step(1).listen()
+  s.add(state, "live").listen()
+  s.add(state, "currentFloor").step(1).listen()
+  s.add(state, "tetromino").options(Object.keys(tetrominos)).listen()
+  s.add(state, "posX").step(1).listen()
+  s.add(state, "posY").step(1).listen()
+  s.add(state, "rotX").step(1).listen()
+  s.add(state, "rotZ").step(1).listen()
   s.open()
 }
