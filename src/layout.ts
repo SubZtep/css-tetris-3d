@@ -1,7 +1,7 @@
 import { pipeline } from "./lib/events"
-import { calcPercent, calcPerspective } from "./lib/utils"
+import { calcPercent } from "./lib/utils"
 import { getProp, setProp, setProps } from "./lib/css"
-import { dimensions, state, liftBlock, rotateX, rotateZ, moveX, moveY } from "./game"
+import { dimensions, liftTetromino, rotateX, rotateZ, moveX, moveY } from "./game"
 import { guiWorks } from "./gui"
 
 let container: HTMLElement
@@ -21,7 +21,7 @@ view = new Proxy(view, {
 
 export const setContainer = (el: HTMLElement): void => {
   container = el
-  calcView()
+  calcCameraView()
 }
 
 export const defaultCSSProps = (): { [prop: string]: string } =>
@@ -34,75 +34,63 @@ export const defaultCSSProps = (): { [prop: string]: string } =>
     ...Object.entries(dimensions).map(([key, value]) => ({ [key]: String(value) }))
   )
 
-export const calcView = (): void => {
-  const { clientWidth: w, clientHeight: h } = container
-  const edge = Math.min(w / dimensions.cols, h / dimensions.rows)
-  view.edge = edge / 2
+export const calcCameraView = (): void => {
+  const we = container.clientWidth / dimensions.cols
+  const he = container.clientHeight / dimensions.rows
+  view.edge = Math.min(we, he) / 2
   view.perspective = dimensions.floors * view.edge * 2
 }
 
-export const handleWindowResize = (): void => new ResizeObserver(calcView).observe(container)
+export const handleResize = (): void => new ResizeObserver(calcCameraView).observe(container)
 
-const perspectiveFollows = ({ buttons, clientX, clientY }) => {
-  if (guiWorks) return
-
-  // if (buttons === 1) {
-
-  const { px, py } = calcPerspective({ ...container, clientX, clientY })
-
+const resetView = () => {
   setProps({
-    perspectiveX: `${100 - px}%`,
-    perspectiveY: `${100 - py}%`,
+    perspectiveX: "50%",
+    perspectiveY: "50%",
   })
-  return true
-  // }
-  // return false
+  calcCameraView()
+}
+
+const calculateEdgePerspective = (pos: number, fastSize: number, fastMulti: number) => {
+  let ePercent = calcPercent(container.clientWidth, pos)
+  if (ePercent > 100 - fastSize) {
+    ePercent += Math.pow(Math.abs(100 - fastSize - ePercent), fastMulti)
+  } else if (ePercent < fastSize) {
+    ePercent -= Math.pow(fastSize - ePercent, fastMulti)
+  }
+  return ePercent
+}
+
+const followCursor = (ev: MouseEvent, fastSize = 10, fastMulti = 2) => {
+  if (guiWorks) {
+    resetView()
+    return
+  }
+  let perspectiveX = 100 - calculateEdgePerspective(ev.clientX, fastSize, fastMulti) + "%"
+  let perspectiveY = 100 - calculateEdgePerspective(ev.clientY, fastSize, fastMulti) + "%"
+  setProps({ perspectiveX, perspectiveY })
 }
 
 const perspectiveScrollToZoom = ({ deltaY }) => {
   const persTurn = 100
   let pers = getProp("perspective", parseFloat)
-  // pers += Math.sign(deltaY) * 100
   pers += Math.sign(deltaY) * (pers < persTurn ? 1 : ~~Math.sqrt(pers - persTurn + 1))
   if (pers > 0) {
     setProp("perspective", `${pers}px`)
   }
 }
 
-export const handlePerspectiveMutates = (): void => {
-  pipeline.mousedown.push(ev => {
-    if (guiWorks) return
-    if (ev.buttons === 1) {
-      view.perspective = view.perspective * dimensions.floors / 350
-    }
-    perspectiveFollows(ev)
-  })
-
-  pipeline.mouseup.push(() => {
-    setProps({
-      perspectiveX: "50%",
-      perspectiveY: "50%",
-    })
-    calcView()
-  })
-
-  pipeline.mousemove.push(perspectiveFollows)
-
-  pipeline.wheel.push()
-}
-
-export const keyboardBlockControl = (ev: KeyboardEvent) => {
-  if (ev.ctrlKey) return false
-
-  const isRotation = ev.metaKey || ev.shiftKey || ev.altKey || ev.ctrlKey
+export const initKeyboardInputs = (ev: KeyboardEvent): boolean | undefined => {
+  if (ev.ctrlKey) return
+  const isRotation = ev.metaKey || ev.shiftKey || ev.altKey
 
   switch (ev.code) {
     case "KeyQ":
-      liftBlock(1)
+      liftTetromino(1)
       break
 
     case "KeyE":
-      liftBlock()
+      liftTetromino()
       break
 
     case "KeyA":
@@ -124,14 +112,21 @@ export const keyboardBlockControl = (ev: KeyboardEvent) => {
     case "ArrowDown":
       isRotation ? rotateX(-90) : moveY(1)
       break
-
-    default:
-      return false
   }
-  return true
+  return false
 }
 
-export const handleGameInput = (): void => {
+export const pipeInputControls = (): void => {
+  pipeline.keydown.push(initKeyboardInputs)
 
-  pipeline.keydown.push(keyboardBlockControl)
+  pipeline.mouseup.push(resetView)
+  pipeline.mousedown.push(followCursor)
+  pipeline.mousemove.push(followCursor)
+  pipeline.wheel.push(perspectiveScrollToZoom)
+
+  pipeline.mousedown.push(ev => {
+    if (ev.buttons === 3) {
+      view.perspective = (view.perspective * dimensions.floors) / 350
+    }
+  })
 }

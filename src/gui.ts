@@ -13,9 +13,9 @@ export const initGUI = (): void => {
   gui.domElement.addEventListener("mouseup", () => (guiWorks = false))
 
   const d = gui.addFolder("Dimensions")
-  d.add(game.dimensions, "cols").min(4).step(1).listen()
-  d.add(game.dimensions, "rows").min(4).step(1).listen()
-  d.add(game.dimensions, "floors").min(4).step(1).listen()
+  d.add(game.dimensions, "cols").min(4).max(50).step(1).listen()
+  d.add(game.dimensions, "rows").min(4).max(50).step(1).listen()
+  d.add(game.dimensions, "floors").min(4).max(50).step(1).listen()
   d.open()
 
   const l = gui.addFolder("Layout")
@@ -25,9 +25,8 @@ export const initGUI = (): void => {
 
   const s = gui.addFolder("State")
   s.add(game.state, "live").listen()
-  s.add(game.state, "rotateMode").listen()
   s.add(game.state, "currentFloor").step(1).listen()
-  s.add(game.state, "block").options(Object.keys(game.blocks)).listen()
+  s.add(game.state, "tetromino").options(Object.keys(game.tetrominos)).listen()
   s.add(game.state, "posX").step(1).listen()
   s.add(game.state, "posY").step(1).listen()
   s.add(game.state, "rotX").step(1).listen()

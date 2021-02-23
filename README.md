@@ -12,7 +12,6 @@
 | Right / D           | Rotate on Y axis backwards            |
 | _Q_ :ghost:         | _Move on Z axis backwards (for test)_ |
 | _E_ :ghost:         | _Move on Z axis (for test)_           |
-| R                   | Toggle rotate mode                    |
 | (left?) ALT + _Key_ | Temporary toggle rotate mode          |
 | Mouse Left & Move   | Perspective follows mouse cursor      |
 | Mouse Scroll        | Change Perspective                    |

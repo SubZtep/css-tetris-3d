@@ -7,13 +7,6 @@ body {
   padding: 0;
 }
 
-.giphy-embed {
-  /* */
-  width: 100%;
-  height: 100%;
-}
-
-
 .crosshair {
   background:
     linear-gradient(#003,#003),
@@ -40,28 +33,32 @@ body {
 .front {
   transform: translateZ(var(--edge));
 }
+
 .right {
   right: 0;
   transform-origin: right;
   transform: rotateY(90deg);
 }
+
 .left {
   left: 0;
   transform-origin: left;
   transform: rotateY(-90deg);
 }
+
 .top {
   top: 0;
   transform-origin: top;
   transform: rotateX(90deg);
 }
+
 .bottom {
   bottom: 0;
   transform-origin: bottom;
   transform: rotateX(-90deg);
 }
 
-.level {
+.scene {
   transform-style: preserve-3d;
   position: absolute;
 
@@ -73,30 +70,14 @@ body {
     position: absolute;
     border: 1px solid #a00;
 
-    background: url("/src/Red GIF-source.gif");
-
-    /*
     background-image:
       repeating-linear-gradient(to right, transparent, transparent var(--edge--px), #600 var(--edge)),
       repeating-linear-gradient(to bottom, transparent, transparent var(--edge--px), #600 var(--edge));
-    */
-
-    /* background-image: line */
 
     &.back {
       width: 100%;
       height: 100%;
       opacity: 0.65;
-      background: url("src/eye.gif");
-      background-size: contain;
-      background-repeat: no-repeat;
-      background-position: center;
-    }
-    &.top {
-      background: url("https://i1.wp.com/css-tricks.com/wp-content/uploads/2018/05/sweep_rip.gif?ssl=1");
-      background-size: contain;
-      filter: hue-rotate(90deg);
-      animation: pulse 5s infinite;
     }
     &.top, &.bottom {
       width: calc(var(--cols) * var(--edge));
@@ -106,17 +87,6 @@ body {
       width: calc(var(--floors) * var(--edge));
       height: calc(var(--rows) * var(--edge));
     }
-  }
-}
-
-@keyframes pulse {
-  0% {
-    /* background-color: #001F3F; */
-    filter: hue-rotate(0deg);
-  }
-  100% {
-    filter: hue-rotate(360deg)
-    /* background-color: #FF4136; */
   }
 }
 
@@ -131,39 +101,27 @@ body {
     width: inherit;
     height: inherit;
     position: absolute;
-    /* background-color: #f008; */
-    /* background: url(kett.gif); */
-
-
-
-    /* background: url("Red GIF-source.gif"); */
-    /* border: 1px solid #000; */
+    background-color: #f008;
     border-radius: 8px;
-    /* border-radius: var(--radius); */
     backface-visibility: hidden;
     transition: border-radius 200ms ease-out;
-    opacity: 0.3;
   }
 
   &.a {
     grid-area: a;
-    background-image: url(src/eq1.gif);
   }
   &.b {
     grid-area: b;
-    background-image: url(src/oscillator2.gif);
   }
   &.c {
     grid-area: c;
-    background-image: url(src/kacsak2.gif);
   }
   &.d {
     grid-area: d;
-    background-image: url("src/an'K4o4.gif");
   }
 }
 
-.block {
+.tetromino {
   --translateX: calc(var(--posX) * var(--edge));
   --translateY: calc(var(--posY) * var(--edge));
   --translateZ: calc(var(--currentFloor) * var(--edge));
@@ -176,7 +134,6 @@ body {
   transform-style: preserve-3d;
   transform: translate3d(var(--translateX), var(--translateY), var(--translateZ)) rotateX(var(--rotateX)) rotateZ(var(--rotateZ));
   transition: 300ms ease-out;
-
   transform-origin: 0 0 var(--edge);
 
   display: grid;
@@ -251,16 +208,16 @@ body {
   top: 0;
   left: 0;
 
-  .mc.floor0 > div { background-color: #111a; }
-  .mc.floor1 > div { background-color: #222a; }
-  .mc.floor2 > div { background-color: #333a; }
-  .mc.floor3 > div { background-color: #444a; }
-  .mc.floor4 > div { background-color: #555a; }
-  .mc.floor5 > div { background-color: #666a; }
-  .mc.floor6 > div { background-color: #777a; }
-  .mc.floor7 > div { background-color: #888a; }
-  .mc.floor8 > div { background-color: #999a; }
-  .mc.floor9 > div { background-color: #aaaa; }
+  .mc.floor0 > div { background-color: #111e; }
+  .mc.floor1 > div { background-color: #222e; }
+  .mc.floor2 > div { background-color: #333e; }
+  .mc.floor3 > div { background-color: #444e; }
+  .mc.floor4 > div { background-color: #555e; }
+  .mc.floor5 > div { background-color: #666e; }
+  .mc.floor6 > div { background-color: #777e; }
+  .mc.floor7 > div { background-color: #888e; }
+  .mc.floor8 > div { background-color: #999e; }
+  .mc.floor9 > div { background-color: #aaae; }
 
   .mc {
     width: var(--edge);

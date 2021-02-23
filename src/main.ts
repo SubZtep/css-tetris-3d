@@ -9,11 +9,10 @@ window.addEventListener("load", () => {
   layout.setContainer(container)
   css.initProps(container)(layout.defaultCSSProps())
 
-  layout.handleWindowResize()
-  layout.handlePerspectiveMutates()
-  layout.handleGameInput()
+  layout.handleResize()
+  layout.pipeInputControls()
 
+  game.resetTetromino()
   game.initBoard()
-  game.resetBlock()
   gui.initGUI()
 })

@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { getProp, setProp } from "./lib/css"
 import { getRandomItem, rotate2d } from "./lib/utils"
-import { calcView } from "./layout"
+import { calcCameraView } from "./layout"
 import * as pool from "./lib/pool"
+import { notify } from "./lib/notification"
 
 let timer: NodeJS.Timeout
 
@@ -17,12 +18,12 @@ dimensions = new Proxy(dimensions, {
     target[p] = value
     setProp(p, String(value))
     initBoard() //FIXME: maybe not like this
-    calcView()
+    calcCameraView()
     return true
   },
 })
 
-export const blocks = {
+export const tetrominos = {
   orangeRick: [
     [0, 0, 1, 0],
     [1, 1, 1, 0],
@@ -52,23 +53,22 @@ export const blocks = {
     [1, 1, 0, 0],
   ],
 }
-Object.freeze(blocks)
+Object.freeze(tetrominos)
 
-type Block = keyof typeof blocks
+type Tetromino = keyof typeof tetrominos
 
 interface GameState {
   live: boolean
-  rotateMode?: boolean
   currentFloor: number
-  block: Block
+  tetromino: Tetromino
   posX: number
   posY: number
   rotX: number
   rotZ: number
 }
 
-const blockChecker = (z: number, moveX = 0, moveY = 0, higher: (testX: number, testY: number) => boolean) => {
-  let tempBlock = blocks[state.block]
+const tetrominoChecker = (z: number, moveX = 0, moveY = 0, higher: (testX: number, testY: number) => boolean) => {
+  let tempTetromino = tetrominos[state.tetromino]
   let rot = (state.rotZ + z) / 90
   if (Math.abs(rot) >= 4) {
     rot %= 4
@@ -90,12 +90,12 @@ const blockChecker = (z: number, moveX = 0, moveY = 0, higher: (testX: number, t
   }
 
   for (let i = 0; i < rot; i++) {
-    tempBlock = rotate2d(tempBlock)
+    tempTetromino = rotate2d(tempTetromino)
   }
 
-  for (let x = 0; x < tempBlock[0].length; x++) {
-    for (let y = 0; y < tempBlock.length; y++) {
-      if (tempBlock[y][x]) {
+  for (let x = 0; x < tempTetromino[0].length; x++) {
+    for (let y = 0; y < tempTetromino.length; y++) {
+      if (tempTetromino[y][x]) {
         const testX = x + moveX + state.posX
         const testY = y + moveY + state.posY
 
@@ -109,7 +109,7 @@ const blockChecker = (z: number, moveX = 0, moveY = 0, higher: (testX: number, t
 }
 
 const testRotZ = (z: number, moveX = 0, moveY = 0) => {
-  return blockChecker(z, moveX, moveY, (testX, testY) => {
+  return tetrominoChecker(z, moveX, moveY, (testX, testY) => {
     if (testX < 0 || testX >= dimensions.cols) {
       return false
     }
@@ -120,10 +120,10 @@ const testRotZ = (z: number, moveX = 0, moveY = 0) => {
   })
 }
 
-const canLiftBlock = () => {
+const canLiftTetromino = () => {
   if (state.currentFloor === 0) return false
   // console.log(board.map(b => [...b.map(c => c.join(" "))]))
-  return blockChecker(0, 0, 0, (testX, testY) => !board[state.currentFloor - 1][testY][testX])
+  return tetrominoChecker(0, 0, 0, (testX, testY) => !board[state.currentFloor - 1][testY][testX])
 }
 
 export const rotateX = (r: -90 | 90): void => {
@@ -132,7 +132,7 @@ export const rotateX = (r: -90 | 90): void => {
   // state.rotX = x
 }
 
-export const rotateZ = (r: -90 | 90): boolean => {
+export const rotateZ = (r: -90 | 90): void => {
   const mayMoves = [0, -1, 1, -2, 2, -3, 3, -4, 4] // FIXME: order based on rotation
   for (const i of mayMoves) {
     for (const j of mayMoves) {
@@ -140,27 +140,21 @@ export const rotateZ = (r: -90 | 90): boolean => {
         state.posX += i
         state.posY += j
         state.rotZ += r
-        return true
       }
     }
   }
-  return false
 }
 
-export const moveX = (d: -1 | 1): boolean => {
+export const moveX = (d: -1 | 1) => {
   if (testRotZ(0, d)) {
     state.posX += d
-    return true
   }
-  return false
 }
 
-export const moveY = (d: -1 | 1): boolean => {
+export const moveY = (d: -1 | 1) => {
   if (testRotZ(0, 0, d)) {
     state.posY += d
-    return true
   }
-  return false
 }
 
 export const handleCSSProps: ProxyHandler<GameState> = {
@@ -169,18 +163,15 @@ export const handleCSSProps: ProxyHandler<GameState> = {
       case "live":
         clearInterval(timer)
         if (value) {
-          timer = setInterval(liftBlock, 3000)
+          timer = setInterval(liftTetromino, 3000)
         }
         break
-      case "block":
-        if (state.block) {
-          document.querySelector(".block").classList.replace(state.block, value as Block)
+      case "tetromino":
+        if (state.tetromino) {
+          document.querySelector(".tetromino").classList.replace(state.tetromino, value as Tetromino)
         } else {
-          document.querySelector(".block").classList.add(value as Block)
+          document.querySelector(".tetromino").classList.add(value as Tetromino)
         }
-        break
-      case "rotateMode":
-        setProp("radius", `${value ? parseFloat(getProp("edge")) / 4 : 0}px`)
         break
       default:
         setProp(p, String(value))
@@ -193,7 +184,6 @@ export const handleCSSProps: ProxyHandler<GameState> = {
 
 export let state: GameState = {
   live: false,
-  rotateMode: false,
 } as GameState
 
 state = new Proxy(state, handleCSSProps)
@@ -208,28 +198,28 @@ export const initBoard = (): void => {
   )
 
   if (state.live) {
-    timer = setInterval(liftBlock, 3000)
+    timer = setInterval(liftTetromino, 3000)
   }
 }
 
-const getNextBlock = (): Block => {
+const getNextTetromino = (): Tetromino => {
   // return "hero"
-  return getRandomItem(Reflect.ownKeys(blocks) as Block[])
+  return getRandomItem(Reflect.ownKeys(tetrominos) as Tetromino[])
 }
 
-export const resetBlock = (): void => {
+export const resetTetromino = (): void => {
   state.currentFloor = dimensions.floors - 1
-  state.block = getNextBlock()
+  state.tetromino = getNextTetromino()
   state.posX = 0
   state.posY = 0
   state.rotX = 0
   state.rotZ = 0
 }
 
-const masonBlock = () => {
+const masonTetromino = () => {
   const frag = document.createDocumentFragment()
 
-  blockChecker(0, 0, 0, (testX, testY) => {
+  tetrominoChecker(0, 0, 0, (testX, testY) => {
     board[state.currentFloor][testY][testX] = 1
     const el = pool.getHTMLElement("mc")
     el.classList.add(`floor${state.currentFloor}`)
@@ -243,10 +233,9 @@ const masonBlock = () => {
 
   if (state.currentFloor + 1 === dimensions.floors - 1) {
     clearInterval(timer)
-    // if (!confirm("(×﹏×)\n\nContinue?")) {
-    //   document.location.href = "https://github.com/SubZtep/css-tetris-3d#readme"
-    // }
-    pool.removeChildren(mason)
+    notify("You Died! (×﹏×)")
+    pool.recallPoolItems(mason)
+
     dimensions.cols++
     dimensions.rows++
     dimensions.floors++
@@ -254,10 +243,10 @@ const masonBlock = () => {
   }
 }
 
-export const liftBlock = (step = -1): void => {
+export const liftTetromino = (step = -1): void => {
   state.currentFloor += step
-  if (!canLiftBlock()) {
-    masonBlock()
-    resetBlock()
+  if (!canLiftTetromino()) {
+    masonTetromino()
+    resetTetromino()
   }
 }
