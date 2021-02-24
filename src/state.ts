@@ -4,18 +4,18 @@ import { Tetromino } from "./tetromino"
 
 export interface GameState {
   live: boolean
-  currentFloor: number
+  screwAxisX: boolean
   tetromino: Tetromino
-  // position: [number, number] // X,Y
-  // rotation: [number, number] // X,Z
   posX: number
   posY: number
+  posZ: number
   rotX: number
   rotZ: number
 }
 
 export let state: GameState = {
   live: false,
+  screwAxisX: false
 } as GameState
 
 
@@ -47,11 +47,3 @@ state = new Proxy(state, {
     return true
   }
 })
-
-// const consoleDebug = () => {
-//   class Stater {
-//     aaa = "111"
-//     bbb = "222"
-//   }
-//   console.table(state)
-// }

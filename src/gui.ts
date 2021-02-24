@@ -23,10 +23,11 @@ export const initGUI = (): void => {
 
   const s = gui.addFolder("State")
   s.add(state, "live").listen()
-  s.add(state, "currentFloor").step(1).listen()
+  s.add(state, "screwAxisX").listen()
   s.add(state, "tetromino").options(Object.keys(tetrominos)).listen()
   s.add(state, "posX").step(1).listen()
   s.add(state, "posY").step(1).listen()
+  s.add(state, "posZ").step(1).listen()
   s.add(state, "rotX").step(1).listen()
   s.add(state, "rotZ").step(1).listen()
   s.open()

@@ -124,7 +124,7 @@ body {
 .tetromino {
   --translateX: calc(var(--posX) * var(--edge));
   --translateY: calc(var(--posY) * var(--edge));
-  --translateZ: calc(var(--currentFloor) * var(--edge));
+  --translateZ: calc(var(--posZ) * var(--edge));
   --rotateX: calc(var(--rotX) * 1deg);
   --rotateZ: calc(var(--rotZ) * 1deg);
 
