@@ -15,9 +15,8 @@ export interface GameState {
 
 export let state: GameState = {
   live: false,
-  screwAxisX: false
+  screwAxisX: false,
 } as GameState
-
 
 state = new Proxy(state, {
   set: (target: GameState, p: keyof GameState, value: GameState[keyof GameState]) => {
@@ -29,6 +28,9 @@ state = new Proxy(state, {
     switch (p) {
       case "live":
         toggleLiveTimer()
+        break
+      case "screwAxisX":
+        setProp("backface", value ? "visible" : "hidden")
         break
       case "tetromino":
         // eslint-disable-next-line no-case-declarations
@@ -45,5 +47,5 @@ state = new Proxy(state, {
 
     // console.table(target)
     return true
-  }
+  },
 })

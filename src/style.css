@@ -103,8 +103,8 @@ body {
     position: absolute;
     background-color: #f008;
     border-radius: 8px;
-    backface-visibility: hidden;
     transition: border-radius 200ms ease-out;
+    backface-visibility: var(--backface);
   }
 
   &.a {

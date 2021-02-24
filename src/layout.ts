@@ -27,6 +27,7 @@ export const defaultCSSProps = (): { [prop: string]: string } =>
     {
       perspectiveX: "50%",
       perspectiveY: "50%",
+      backface: "hidden",
     },
     ...Object.entries(dimensions).map(([key, value]) => ({ [key]: String(value) }))
   )
@@ -59,7 +60,7 @@ export const calculateEdgePerspective = (pos: number, fastSize: number, fastMult
 }
 
 export const followCursor = (ev: MouseEvent, fastSize = 10, fastMulti = 2) => {
-  if (! ev.ctrlKey) return
+  if (!ev.ctrlKey) return
   const perspectiveX = 100 - calculateEdgePerspective(ev.clientX, fastSize, fastMulti) + "%"
   const perspectiveY = 100 - calculateEdgePerspective(ev.clientY, fastSize, fastMulti) + "%"
   setProps({ perspectiveX, perspectiveY })
