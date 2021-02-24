@@ -1,6 +1,6 @@
-import { toggleLiveTimer } from "./game"
 import { setProp } from "./lib/css"
 import { Tetromino } from "./tetromino"
+import { resetLiveTimer } from "./game"
 
 export interface GameState {
   live: boolean
@@ -14,7 +14,7 @@ export interface GameState {
 }
 
 export let state: GameState = {
-  live: false,
+  live: true,
   screwAxisX: false,
 } as GameState
 
@@ -27,7 +27,7 @@ state = new Proxy(state, {
 
     switch (p) {
       case "live":
-        toggleLiveTimer()
+        resetLiveTimer()
         break
       case "screwAxisX":
         setProp("backface", value ? "visible" : "hidden")

@@ -92,7 +92,6 @@ export const tetrominoChecker = (
 }
 
 export const getNextTetromino = (): Tetromino => {
-  // return "clevelandZ"
   // return "hero"
   return getRandomItem(Reflect.ownKeys(tetrominos) as Tetromino[])
 }

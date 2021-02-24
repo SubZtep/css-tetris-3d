@@ -6,7 +6,7 @@ import { board, dimensions, initBoard } from "./board"
 
 let timer: NodeJS.Timeout
 
-export const toggleLiveTimer = () => {
+export const resetLiveTimer = () => {
   clearInterval(timer)
   if (state.live) {
     timer = setInterval(liftTetromino, 3000)
@@ -35,7 +35,6 @@ const testRot = (z: number, moveX = 0, moveY = 0) => {
 }
 
 const canLiftTetromino = () => {
-  console.log([state.posZ, dimensions.floors])
   if (state.posZ === 0 || state.posZ >= dimensions.floors) {
     return false
   }
@@ -92,7 +91,6 @@ const brickTetromino = () => {
   mason.appendChild(frag)
 
   if (state.posZ + 1 === dimensions.floors - 1) {
-    clearInterval(timer)
     notify("You Died! (×﹏×)")
     pool.recallPoolItems(mason)
 
@@ -100,10 +98,6 @@ const brickTetromino = () => {
     dimensions.rows++
     dimensions.floors++
     initBoard()
-
-    if (state.live) {
-      timer = setInterval(liftTetromino, 3000)
-    }
   }
 }
 

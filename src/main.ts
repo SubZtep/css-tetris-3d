@@ -15,6 +15,7 @@ window.addEventListener("load", () => {
 
   input.pipeInputControls()
   board.initBoard()
+  game.resetLiveTimer()
   game.resetTetromino()
   gui.initGUI()
 })
