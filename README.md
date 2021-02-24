@@ -6,6 +6,12 @@ This is an unfinished _Tetris_ game implied experiment with [CSS 3D](https://dev
 
 _Tetromino_ aka block movement is implemented as expected but rotation only on the Z axis is enabled by default. Collision detection in 3D space goes beyond the original purpose of this thing.
 
+## Demo
+
+**Live on [GitHub Pages](https://subztep.github.io/css-tetris-3d/).**
+
+Running locally as usual — `clone && npm i && npm start`.
+
 ## Configured Inputs
 
 | Input                               | Event                                         |
@@ -23,15 +29,15 @@ _Tetromino_ aka block movement is implemented as expected but rotation only on t
 
 ## GUI
 
-For other tweaks please find the implemented [dat.GUI](https://github.com/dataarts/dat.gui) runtime. The most intriguing state parameters are connected. Probably only these toggleables below are nebulous:
+For other tweaks please find the implemented [dat.GUI](https://github.com/dataarts/dat.gui) runtime. The most intriguing state parameters are connected. Probably only these toggleables below are nebulous.
 
 | Property     | State changes                               |
 | ------------ | ------------------------------------------- |
-| `live`       | Moving tetrominos automatically like a game |
-| `screwAxisX` | Enable 3D rotation on X axis                |
+| `live`       | Moving tetrominos automatically like a game. |
+| `screwAxisX` | Enable 3D rotation on X axis.                |
 
 ## Outcome
 
 - Fun and easy to work with, spectacular with the combination of animation [keyframes](https://developer.mozilla.org/en-US/docs/Web/CSS/@keyframes) without any supplementary knowledge.
 - Performance differences are visible — especially with unoptimised code — within different CSS engines.
-- Feels basic compared to WebGL, I don't really see any real-life consumption on this level. However there is potential to bring [A-Frame](https://github.com/aframevr/aframe/) like 3D markup for messes.
+- Feels basic compared to WebGL. Aspire to post‒ _Flash_／_jQuery_ image carousel fallout but I don't really see any real-life consumption on this level. However, there is potential to bring [A-Frame](https://github.com/aframevr/aframe/) like 3D markup for messes.
