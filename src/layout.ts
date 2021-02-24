@@ -34,7 +34,7 @@ export const defaultCSSProps = (): { [prop: string]: string } =>
 export const calcCameraView = (): void => {
   const we = container.clientWidth / dimensions.cols
   const he = container.clientHeight / dimensions.rows
-  view.edge = Math.min(we, he) / 2 / 1.5
+  view.edge = Math.min(we, he) / 2
   view.perspective = dimensions.floors * view.edge * 2
 }
 
